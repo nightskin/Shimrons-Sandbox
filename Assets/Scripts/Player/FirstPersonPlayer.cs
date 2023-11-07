@@ -4,7 +4,8 @@ using UnityEngine.UI;
 public class FirstPersonPlayer : MonoBehaviour
 {
     //For Terrain
-    public Chunk chunkLocation;
+    public Vector3 prevChunkLocation;
+    public Vector3 chunkLocation;
 
 
     // For Input
@@ -14,6 +15,7 @@ public class FirstPersonPlayer : MonoBehaviour
     //Components
     public Transform camera;
     [SerializeField] CharacterController controller;
+    [SerializeField] Transform groundCheck;
 
     // For basic motion
     Vector3 moveDirection;
@@ -28,6 +30,11 @@ public class FirstPersonPlayer : MonoBehaviour
     // For Jumping
     [SerializeField] float jumpHeight = 5;
     [SerializeField] Vector3 velocity = new Vector3();
+    [SerializeField] float gravity = -9.81f;
+    [SerializeField] LayerMask groundMask;
+
+    bool isGrounded = false;
+    float groundDistance = 0.4f;
 
 
 
@@ -37,10 +44,9 @@ public class FirstPersonPlayer : MonoBehaviour
         controls = new Controls();
         actions = controls.Player;
         actions.Enable();
+
+        actions.Jump.performed += Jump_performed;
     }
-
-
-
 
     void Update()
     {
@@ -48,15 +54,48 @@ public class FirstPersonPlayer : MonoBehaviour
         Movement();
     }
 
+    void Jump_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (isGrounded)
+        {
+            velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+        }
+    }
+
     void Movement()
     {
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+
+        if(isGrounded && velocity.y < 0)
+        {
+            velocity.y = 0;
+        }
+
         //Basic Motion
         float x = actions.Move.ReadValue<Vector2>().x;
         float z = actions.Move.ReadValue<Vector2>().y;
 
         //Move Normally
-        moveDirection = camera.transform.right * x + camera.transform.forward * z;
+        moveDirection = transform.right * x + transform.forward * z;
         controller.Move(moveDirection * speed * Time.deltaTime);
+
+        //Apply Gravity
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+
+
+
+        if(actions.Move.ReadValue<Vector2>().magnitude > 0)
+        {
+            prevChunkLocation = chunkLocation;
+
+            //Calculate ChunkPos
+            float chunkPosX = Mathf.Round(transform.position.x / ChunkManager.chunkSize) * ChunkManager.chunkSize;
+            float chunkPosZ = Mathf.Round(transform.position.z / ChunkManager.chunkSize) * ChunkManager.chunkSize;
+            chunkLocation = new Vector3(chunkPosX, 0, chunkPosZ);
+        }
+
+
 
     }
 

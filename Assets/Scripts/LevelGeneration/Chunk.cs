@@ -6,14 +6,13 @@ public class Chunk : MonoBehaviour
 {
     Point[,,] map = null;
 
-    [SerializeField] bool useVoxels = false;
+    
     public Vector3 center = Vector3.zero;
     public float maxHeight = 15;
 
-    [Min(1)] public  int tilesX = 16;
-    [Min(1)] public  int tilesY = 32;
-    [Min(1)] public  int tilesZ = 16;
-    public int tileSize = 5;
+    public static int tilesXZ = 32;
+    public static int tilesY = 32;
+    public static int tileSize = 5;
     
 
     public float noiseScale = 0.001f;
@@ -30,11 +29,9 @@ public class Chunk : MonoBehaviour
     void Start()
     {
         mesh = new Mesh();
+        
         GetComponent<MeshFilter>().mesh = mesh;
-        map = new Point[tilesX, tilesY, tilesZ];
-
-        GetComponent<BoxCollider>().size = new Vector3(tilesX - 2, tilesY - 2, tilesZ - 2) * tileSize;
-        GetComponent<BoxCollider>().center = new Vector3(-5, -5, -5);
+        map = new Point[tilesXZ, tilesY, tilesXZ];
         Generate();
 
     }
@@ -52,7 +49,7 @@ public class Chunk : MonoBehaviour
     
     float Evaluate2D(Vector3 point)
     {
-        return Mathf.PerlinNoise((point.x + 0.1f) * noiseScale, (point.z + 0.1f) * noiseScale);
+        return Mathf.Abs(ChunkManager.noise.Evaluate(point * noiseScale));
     }
 
     public void RemoveBlock(Vector3 hit)
@@ -60,11 +57,11 @@ public class Chunk : MonoBehaviour
         Vector3 localPos = hit - transform.position;
         Point closestSpace = map[0, 0, 0];
 
-        for (int x = 0; x < tilesX; x++)
+        for (int x = 0; x < tilesXZ; x++)
         {
             for (int y = 0; y < tilesY; y++)
             {
-                for (int z = 0; z < tilesZ; z++)
+                for (int z = 0; z < tilesXZ; z++)
                 {
                     if (map[x, y, z].active)
                     {
@@ -91,7 +88,7 @@ public class Chunk : MonoBehaviour
             colors.Clear();
             buffer = 0;
 
-            if (useVoxels) CreateVoxels();
+            if (ChunkManager.useVoxels) CreateVoxels();
             else MarchingCubes();
             UpdateMesh();
         }
@@ -103,11 +100,11 @@ public class Chunk : MonoBehaviour
         Vector3 localPos = hit - transform.position;
         Point closestSpace = map[0, 0, 0];
 
-        for (int x = 0; x < tilesX; x++)
+        for (int x = 0; x < tilesXZ; x++)
         {
             for (int y = 0; y < tilesY; y++)
             {
-                for (int z = 0; z < tilesZ; z++)
+                for (int z = 0; z < tilesXZ; z++)
                 {
                     if (!map[x, y, z].active)
                     {
@@ -128,7 +125,7 @@ public class Chunk : MonoBehaviour
         colors.Clear();
         buffer = 0;
 
-        if (useVoxels) CreateVoxels();
+        if (ChunkManager.useVoxels) CreateVoxels();
         else MarchingCubes();
         UpdateMesh();
     }
@@ -142,7 +139,7 @@ public class Chunk : MonoBehaviour
         buffer = 0;
 
         CreateMap();
-        if (useVoxels) CreateVoxels();
+        if (ChunkManager.useVoxels) CreateVoxels();
         else MarchingCubes();
         UpdateMesh();
 
@@ -320,18 +317,18 @@ public class Chunk : MonoBehaviour
 
     void CreateMap()
     {
-        for (int x = 0; x < tilesX; x++)
+        for (int x = 0; x < tilesXZ; x++)
         {
             for (int y = 0; y < tilesY; y++)
             {
-                for (int z = 0; z < tilesZ; z++)
+                for (int z = 0; z < tilesXZ; z++)
                 {
                     map[x, y, z] = new Point();
                     map[x, y, z].x = x;
                     map[x, y, z].y = y;
                     map[x, y, z].z = z;
 
-                    map[x, y, z].position = new Vector3(x - (tilesX / 2), y - (tilesY / 2), z - (tilesZ / 2)) * tileSize;
+                    map[x, y, z].position = new Vector3(x - (tilesXZ / 2), y - (tilesY / 2), z - (tilesXZ / 2)) * tileSize;
                     map[x, y, z].height = Evaluate2D(map[x, 0, z].position + center) * maxHeight;
                     map[x, y, z].value = Evaluate3D(map[x, y, z].position + center); 
 
@@ -345,7 +342,7 @@ public class Chunk : MonoBehaviour
 
                     if(map[x,y,z].value >= noiseThreshold)
                     {
-                        map[x, y, z].active = false;
+                        //map[x, y, z].active = false;
                     }
 
                     if(y == 0)
@@ -361,15 +358,15 @@ public class Chunk : MonoBehaviour
 
     void CreateVoxels()
     {
-        for (int x = 0; x < tilesX; x++)
+        for (int x = 0; x < tilesXZ; x++)
         {
             for (int y = 0; y < tilesY; y++)
             {
-                for (int z = 0; z < tilesZ; z++)
+                for (int z = 0; z < tilesXZ; z++)
                 {
                     if (map[x, y, z].active)
                     {
-                        if (x < tilesX - 1)
+                        if (x < tilesXZ - 1)
                         {
                             if (!map[x + 1, y, z].active) CreateQuadRight(map[x, y, z].position, tileSize, map[x, y, z].color);
                         }
@@ -385,7 +382,7 @@ public class Chunk : MonoBehaviour
                         {
                             if (!map[x, y - 1, z].active) CreateQuadBottom(map[x, y, z].position, tileSize, map[x, y, z].color);
                         }
-                        if (z < tilesZ - 1)
+                        if (z < tilesXZ - 1)
                         {
                             if (!map[x, y, z + 1].active) CreateQuadFront(map[x, y, z].position, tileSize, map[x, y, z].color);
                         }
@@ -397,9 +394,9 @@ public class Chunk : MonoBehaviour
                         if (x == 0) CreateQuadLeft(map[x, y, z].position, tileSize, map[x, y, z].color);
                         if (y == 0) CreateQuadBottom(map[x, y, z].position, tileSize, map[x, y, z].color);
                         if (z == 0) CreateQuadBack(map[x, y, z].position, tileSize, map[x, y, z].color);
-                        if (x == tilesX - 1) CreateQuadRight(map[x, y, z].position, tileSize, map[x, y, z].color);
+                        if (x == tilesXZ - 1) CreateQuadRight(map[x, y, z].position, tileSize, map[x, y, z].color);
                         if (y == tilesY - 1) CreateQuadTop(map[x, y, z].position, tileSize, map[x, y, z].color);
-                        if (z == tilesZ - 1) CreateQuadFront(map[x, y, z].position, tileSize, map[x, y, z].color);
+                        if (z == tilesXZ - 1) CreateQuadFront(map[x, y, z].position, tileSize, map[x, y, z].color);
 
                     }
                 }
@@ -410,13 +407,13 @@ public class Chunk : MonoBehaviour
     void MarchingCubes()
     {
 
-        for (int x = tilesX; x > 0; x--)
+        for (int x = tilesXZ; x > 0; x--)
         {
             for (int y = tilesY; y > 0; y--)
             {
-                for (int z = tilesZ; z > 0; z--)
+                for (int z = tilesXZ; z > 0; z--)
                 {
-                    if (x < tilesX - 1 && y < tilesY - 1 && z < tilesZ - 1)
+                    if (x < tilesXZ - 1 && y < tilesY - 1 && z < tilesXZ - 1)
                     {
                         Point[] points = new Point[]
                         {
@@ -476,11 +473,11 @@ public class Chunk : MonoBehaviour
 
     bool BlocksGone()
     {
-        for (int x = 0; x < tilesX; x++)
+        for (int x = 0; x < tilesXZ; x++)
         {
             for (int y = 0; y < tilesY; y++)
             {
-                for (int z = 0; z < tilesZ; z++)
+                for (int z = 0; z < tilesXZ; z++)
                 {
                     if (map[x, y, z].active) return false;
                 }

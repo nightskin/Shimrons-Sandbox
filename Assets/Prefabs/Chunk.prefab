@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 891923478942689955}
   - component: {fileID: 891923478942689954}
   - component: {fileID: 891923478942689949}
-  - component: {fileID: 4017402519164361142}
   - component: {fileID: 891923478942689950}
   m_Layer: 3
   m_Name: Chunk
@@ -100,19 +99,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!65 &4017402519164361142
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 891923478942689952}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &891923478942689950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,12 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 223f0d02288cf104da4651373aee0d4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useVoxels: 0
   center: {x: 0, y: 0, z: 0}
   maxHeight: 15
-  tilesX: 16
-  tilesY: 32
-  tilesZ: 16
-  tileSize: 5
-  noiseScale: 0.01
-  noiseThreshold: 0.25
+  noiseScale: 0.0025
+  noiseThreshold: 0.5

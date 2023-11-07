@@ -3,54 +3,100 @@ using UnityEngine;
 
 public class ChunkManager : MonoBehaviour
 {
-    public static string seed;
+    public string seed = "";
+
     public static Noise noise;
+    public static float chunkSize = 0;
+    public static bool useVoxels = false;
 
-    static GameObject player;
+    [SerializeField] float maxViewDistance = 500;
+    [SerializeField] FirstPersonPlayer player;
     [SerializeField] GameObject chunkPrefab;
-    static int chunksX = 4;
-    static int chunksZ = 4;
+    
+    int chunksXZ;
+    
 
-    static Vector3 chunkOffset = new Vector3();
-    public static Chunk[,] chunks;
+    public static Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3, Chunk>();
 
     void Awake()
     {
-        seed = System.DateTime.Now.ToString();
+        if (seed == string.Empty) seed = System.DateTime.Now.ToString();
         noise = new Noise(seed.GetHashCode());
-        if (!player) player = GameObject.FindGameObjectWithTag("Player");
+        if (!player) player = GameObject.FindGameObjectWithTag("Player").GetComponent<FirstPersonPlayer>();
+        chunkSize = Chunk.tilesXZ * Chunk.tileSize - 10;
+        chunksXZ = Mathf.RoundToInt(maxViewDistance / chunkSize);
+
     }
 
     void Start()
     {
-        Chunk chunk = chunkPrefab.GetComponent<Chunk>();
-        chunkOffset.x = chunk.tilesX * chunk.tileSize - 10;
-        chunkOffset.z = chunk.tilesZ * chunk.tileSize - 10;
-
-        chunks = new Chunk[chunksX, chunksZ];
-
-        for (int x = 0; x < chunksX; x++)
+        for (int x = -chunksXZ; x <= chunksXZ; x++)
         {
-            for (int z = 0; z < chunksZ; z++)
+            for (int z = -chunksXZ; z <= chunksXZ; z++)
             {
-                Vector3 pos = player.transform.position + new Vector3(x * chunkOffset.x, 0, z * chunkOffset.z);
-                var c = Instantiate(chunkPrefab, pos, Quaternion.identity);
-                c.GetComponent<Chunk>().center = pos;
-                c.name = x.ToString() + z.ToString();
-                chunks[x, z] = c.GetComponent<Chunk>();
+                Vector3 position = player.transform.position + new Vector3(x * chunkSize, 0, z * chunkSize);
+                CreateChunk(position);
+            }
+        }
+
+        foreach (Vector3 chunkPosition in chunks.Keys)
+        {
+            if (Vector3.Distance(chunkPosition, player.chunkLocation) > maxViewDistance)
+            {
+                UnloadChunk(chunkPosition);
+            }
+        }
+
+    }
+
+    void Update()
+    {
+        if(player.prevChunkLocation != player.chunkLocation)
+        {
+            for (int x = -chunksXZ; x <= chunksXZ; x++)
+            {
+                for (int z = -chunksXZ; z <= chunksXZ; z++)
+                {
+                    Vector3 position = player.transform.position + new Vector3(x * chunkSize, 0, z * chunkSize);
+                    LoadChunk(position);
+                }
+            }
+
+            foreach(Vector3 chunkPosition in chunks.Keys)
+            {
+                if(Vector3.Distance(chunkPosition, player.chunkLocation) > maxViewDistance)
+                {
+                    UnloadChunk(chunkPosition);
+                }
             }
         }
     }
 
-    public static void RegenerateChunks()
+    void CreateChunk(Vector3 position)
     {
-        
+        var c = Instantiate(chunkPrefab, position, Quaternion.identity, transform);
+        c.GetComponent<Chunk>().center = position;
+        c.name = position.ToString();
+        chunks.Add(position, c.GetComponent<Chunk>());
     }
 
-
-    void Update()
+    void LoadChunk(Vector3 position)
     {
-        
+        if(chunks.ContainsKey(position))
+        {
+            chunks[position].gameObject.SetActive(true);
+        }
+        else
+        {
+            CreateChunk(position);
+        }
     }
-
+    
+    void UnloadChunk(Vector3 position)
+    {
+        if (chunks.ContainsKey(position))
+        {
+            chunks[position].gameObject.SetActive(false);
+        }
+    }
 }
