@@ -4,15 +4,19 @@ using UnityEngine;
 public class ChunkManager : MonoBehaviour
 {
     public string seed = "";
+    public bool noVoxels = true;
+    public Gradient landGradient;
 
     public static Noise noise;
     public static float chunkSize = 0;
-    public static bool useVoxels = false;
+    public float noiseScale = 0.0025f;
+    public float noiseThreshold = 0.5f;
 
     [SerializeField] float maxViewDistance = 500;
     [SerializeField] FirstPersonPlayer player;
     [SerializeField] GameObject chunkPrefab;
-    
+
+
     int chunksXZ;
     
 
@@ -76,6 +80,7 @@ public class ChunkManager : MonoBehaviour
     {
         var c = Instantiate(chunkPrefab, position, Quaternion.identity, transform);
         c.GetComponent<Chunk>().center = position;
+        c.GetComponent<Chunk>().Generate(noVoxels);
         c.name = position.ToString();
         chunks.Add(position, c.GetComponent<Chunk>());
     }

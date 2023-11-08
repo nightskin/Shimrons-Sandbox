@@ -4,20 +4,19 @@ using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
-    Point[,,] map = null;
+    public Point[,,] map = null;
 
     
     public Vector3 center = Vector3.zero;
-    public float maxHeight = 15;
+    public float maxHeight = 16;
 
     public static int tilesXZ = 32;
     public static int tilesY = 32;
-    public static int tileSize = 5;
-    
+    public static int tileSize = 2;
 
-    public float noiseScale = 0.001f;
-    [SerializeField] float noiseThreshold = 0.5f;
 
+
+    ChunkManager ChunkManager;
     Mesh mesh;
 
     List<Vector3> verts = new List<Vector3>();
@@ -26,30 +25,23 @@ public class Chunk : MonoBehaviour
     List<int> tris = new List<int>();
     int buffer = 0;
 
-    void Start()
+    void Awake()
     {
+        ChunkManager = GameObject.Find("ChunkManager").GetComponent<ChunkManager>();
         mesh = new Mesh();
-        
         GetComponent<MeshFilter>().mesh = mesh;
         map = new Point[tilesXZ, tilesY, tilesXZ];
-        Generate();
-
-    }
-
-    void OnValidate()
-    {
-        if (mesh) Generate();
     }
 
 
     float Evaluate3D(Vector3 point)
     {
-        return ChunkManager.noise.Evaluate(point * noiseScale);
+        return ChunkManager.noise.Evaluate(point * ChunkManager.noiseScale);
     }
     
     float Evaluate2D(Vector3 point)
     {
-        return Mathf.Abs(ChunkManager.noise.Evaluate(point * noiseScale));
+        return Mathf.Abs(ChunkManager.noise.Evaluate(point * ChunkManager.noiseScale));
     }
 
     public void RemoveBlock(Vector3 hit)
@@ -88,7 +80,7 @@ public class Chunk : MonoBehaviour
             colors.Clear();
             buffer = 0;
 
-            if (ChunkManager.useVoxels) CreateVoxels();
+            if (ChunkManager.noVoxels) CreateVoxels();
             else MarchingCubes();
             UpdateMesh();
         }
@@ -125,12 +117,12 @@ public class Chunk : MonoBehaviour
         colors.Clear();
         buffer = 0;
 
-        if (ChunkManager.useVoxels) CreateVoxels();
+        if (ChunkManager.noVoxels) CreateVoxels();
         else MarchingCubes();
         UpdateMesh();
     }
 
-    public void Generate()
+    public void Generate(bool noVoxels = true)
     {
         uvs.Clear();
         verts.Clear();
@@ -139,18 +131,18 @@ public class Chunk : MonoBehaviour
         buffer = 0;
 
         CreateMap();
-        if (ChunkManager.useVoxels) CreateVoxels();
-        else MarchingCubes();
+        if (noVoxels) MarchingCubes();
+        else CreateVoxels();
         UpdateMesh();
 
     }
 
     void CreateQuadBack(Vector3 position, float size, Color color)
     {
-        verts.Add(new Vector3(-1, 1, -1) * size + position);
-        verts.Add(new Vector3(1, -1, -1) * size + position);
-        verts.Add(new Vector3(-1, -1, -1) * size + position);
-        verts.Add(new Vector3(1, 1, -1) * size + position);
+        verts.Add(new Vector3(-0.5f, 0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, -0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(-0.5f, -0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, 0.5f, -0.5f) * size + position);
 
         tris.Add(0 + buffer);
         tris.Add(1 + buffer);
@@ -175,10 +167,10 @@ public class Chunk : MonoBehaviour
 
     void CreateQuadFront(Vector3 position, float size, Color color)
     {
-        verts.Add(new Vector3(-1, 1, 1) * size + position);
-        verts.Add(new Vector3(1, -1, 1) * size + position);
-        verts.Add(new Vector3(-1, -1, 1) * size + position);
-        verts.Add(new Vector3(1, 1, 1) * size + position);
+        verts.Add(new Vector3(-0.5f, 0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, -0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(-0.5f, -0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, 0.5f, 0.5f) * size + position);
 
         tris.Add(1 + buffer);
         tris.Add(0 + buffer);
@@ -203,10 +195,10 @@ public class Chunk : MonoBehaviour
 
     void CreateQuadRight(Vector3 position, float size, Color color)
     {
-        verts.Add(new Vector3(1, 1, 1) * size + position);
-        verts.Add(new Vector3(1, -1, 1) * size + position);
-        verts.Add(new Vector3(1, -1, -1) * size + position);
-        verts.Add(new Vector3(1, 1, -1) * size + position);
+        verts.Add(new Vector3(0.5f, 0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, -0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, -0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, 0.5f, -0.5f) * size + position);
 
         tris.Add(3 + buffer);
         tris.Add(0 + buffer);
@@ -231,10 +223,10 @@ public class Chunk : MonoBehaviour
 
     void CreateQuadLeft(Vector3 position, float size, Color color)
     {
-        verts.Add(new Vector3(-1, 1, 1) * size + position);
-        verts.Add(new Vector3(-1, -1, 1) * size + position);
-        verts.Add(new Vector3(-1, -1, -1) * size + position);
-        verts.Add(new Vector3(-1, 1, -1) * size + position);
+        verts.Add(new Vector3(-0.5f, 0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(-0.5f, -0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(-0.5f, -0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(-0.5f, 0.5f, -0.5f) * size + position);
 
         tris.Add(0 + buffer);
         tris.Add(3 + buffer);
@@ -259,10 +251,10 @@ public class Chunk : MonoBehaviour
 
     void CreateQuadBottom(Vector3 position, float size, Color color)
     {
-        verts.Add(new Vector3(-1, -1, -1) * size + position);
-        verts.Add(new Vector3(-1, -1, 1) * size + position);
-        verts.Add(new Vector3(1, -1, -1) * size + position);
-        verts.Add(new Vector3(1, -1, 1) * size + position);
+        verts.Add(new Vector3(-0.5f, -0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(-0.5f, -0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, -0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, -0.5f, 0.5f) * size + position);
 
         tris.Add(1 + buffer);
         tris.Add(0 + buffer);
@@ -288,10 +280,10 @@ public class Chunk : MonoBehaviour
 
     void CreateQuadTop(Vector3 position, float size, Color color)
     {
-        verts.Add(new Vector3(-1, 1, -1) * size + position);
-        verts.Add(new Vector3(-1, 1, 1) * size + position);
-        verts.Add(new Vector3(1, 1, -1) * size + position);
-        verts.Add(new Vector3(1, 1, 1) * size + position);
+        verts.Add(new Vector3(-0.5f, 0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(-0.5f, 0.5f, 0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, 0.5f, -0.5f) * size + position);
+        verts.Add(new Vector3(0.5f, 0.5f, 0.5f) * size + position);
 
         tris.Add(0 + buffer);
         tris.Add(1 + buffer);
@@ -328,21 +320,18 @@ public class Chunk : MonoBehaviour
                     map[x, y, z].y = y;
                     map[x, y, z].z = z;
 
-                    map[x, y, z].position = new Vector3(x - (tilesXZ / 2), y - (tilesY / 2), z - (tilesXZ / 2)) * tileSize;
-                    map[x, y, z].height = Evaluate2D(map[x, 0, z].position + center) * maxHeight;
-                    map[x, y, z].value = Evaluate3D(map[x, y, z].position + center); 
+                    map[x, y, z].position = new Vector3(x - (tilesXZ / 2), y - (tilesY / 2), z - (tilesXZ / 2)) * (tileSize);
+                    map[x, y, z].height = Evaluate2D(map[x, y, z].position + center) * maxHeight;
+                    map[x, y, z].value = Evaluate3D(map[x, y, z].position + center);
+
+                    map[x, y, z].color = ChunkManager.landGradient.Evaluate(map[x, y, z].height / maxHeight);
 
                     if(y <= map[x,y,z].height)
                     {
-                        if(map[x,y,z].height >= noiseThreshold)
+                        if(map[x,y,z].height >= ChunkManager.noiseThreshold)
                         {
                             map[x, y, z].active = true;
                         }
-                    }
-
-                    if(map[x,y,z].value >= noiseThreshold)
-                    {
-                        //map[x, y, z].active = false;
                     }
 
                     if(y == 0)
@@ -439,6 +428,7 @@ public class Chunk : MonoBehaviour
 
                                 verts.Add(vertexPos);
                                 tris.Add(buffer);
+                                colors.Add(GetMidPointColor(points[a], points[b]));
                                 buffer++;
                             }
                             else
@@ -469,6 +459,11 @@ public class Chunk : MonoBehaviour
     Vector3 GetMidPoint(Point point1, Point point2)
     {
         return (point1.position + point2.position) / 2;
+    }
+
+    Color GetMidPointColor(Point point1, Point point2)
+    {
+        return (point1.color + point2.color) / 2;
     }
 
     bool BlocksGone()
