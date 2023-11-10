@@ -1,56 +1,56 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class ChunkManager : MonoBehaviour
 {
     public string seed = "";
-    public bool noVoxels = true;
+    public bool fuckMinecraft = true;
     public Gradient landGradient;
+    public float maxHeight = 16;
+    public int tilesPerChunkXZ = 32;
+    public int tilesPerChunkY = 32;
+    public int tileSize = 3;
 
     public static Noise noise;
     public static float chunkSize = 0;
     public float noiseScale = 0.0025f;
     public float noiseThreshold = 0.5f;
 
-    [SerializeField] float maxViewDistance = 500;
+    float maxViewDistance;
     [SerializeField] FirstPersonPlayer player;
     [SerializeField] GameObject chunkPrefab;
 
+    CancellationTokenSource tokenSource;
 
     int chunksXZ;
-    
-
-    public static Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3, Chunk>();
+    public static Dictionary<Vector3,Chunk> allChunks = new Dictionary<Vector3, Chunk>();
 
     void Awake()
     {
+        maxViewDistance = Camera.main.farClipPlane;
         if (seed == string.Empty) seed = System.DateTime.Now.ToString();
         noise = new Noise(seed.GetHashCode());
         if (!player) player = GameObject.FindGameObjectWithTag("Player").GetComponent<FirstPersonPlayer>();
-        chunkSize = Chunk.tilesXZ * Chunk.tileSize - 10;
+        chunkSize = tilesPerChunkXZ * tileSize - 10;
         chunksXZ = Mathf.RoundToInt(maxViewDistance / chunkSize);
-
     }
 
     void Start()
     {
+        tokenSource = new CancellationTokenSource();
         for (int x = -chunksXZ; x <= chunksXZ; x++)
         {
             for (int z = -chunksXZ; z <= chunksXZ; z++)
             {
-                Vector3 position = player.transform.position + new Vector3(x * chunkSize, 0, z * chunkSize);
-                CreateChunk(position);
+                Vector3 position = player.chunkLocation + new Vector3(x * chunkSize, 0, z * chunkSize);
+                if(Vector3.Distance(position, player.chunkLocation) <= maxViewDistance)
+                {
+                    CreateChunk(position);
+                }
             }
         }
-
-        foreach (Vector3 chunkPosition in chunks.Keys)
-        {
-            if (Vector3.Distance(chunkPosition, player.chunkLocation) > maxViewDistance)
-            {
-                UnloadChunk(chunkPosition);
-            }
-        }
-
     }
 
     void Update()
@@ -61,47 +61,76 @@ public class ChunkManager : MonoBehaviour
             {
                 for (int z = -chunksXZ; z <= chunksXZ; z++)
                 {
-                    Vector3 position = player.transform.position + new Vector3(x * chunkSize, 0, z * chunkSize);
-                    LoadChunk(position);
+                    Vector3 position = player.chunkLocation + new Vector3(x * chunkSize, 0, z * chunkSize);
+                    if(Vector3.Distance(position, player.chunkLocation) <= maxViewDistance)
+                    {
+                        LoadChunk(position);
+                    }
                 }
             }
-
-            foreach(Vector3 chunkPosition in chunks.Keys)
+            foreach(Vector3 position in allChunks.Keys)
             {
-                if(Vector3.Distance(chunkPosition, player.chunkLocation) > maxViewDistance)
+                if (Vector3.Distance(position, player.chunkLocation) > maxViewDistance)
                 {
-                    UnloadChunk(chunkPosition);
+                    UnloadChunk(position);
                 }
             }
         }
     }
 
-    void CreateChunk(Vector3 position)
+    void OnDisable()
     {
-        var c = Instantiate(chunkPrefab, position, Quaternion.identity, transform);
-        c.GetComponent<Chunk>().center = position;
-        c.GetComponent<Chunk>().Generate(noVoxels);
-        c.name = position.ToString();
-        chunks.Add(position, c.GetComponent<Chunk>());
+        tokenSource.Cancel();
     }
 
-    void LoadChunk(Vector3 position)
+    void CreateChunk(Vector3 chunkPosition)
     {
-        if(chunks.ContainsKey(position))
+        var chunk = Instantiate(chunkPrefab, chunkPosition, Quaternion.identity, transform).GetComponent<Chunk>();
+        allChunks.Add(chunkPosition, chunk);
+        chunk.CreateMeshData(chunkPosition);
+        chunk.Generate(fuckMinecraft);
+        chunk.Draw();
+    }
+
+    async void CreateChunkAsync(Vector3 chunkPosition)
+    {
+        var chunk = Instantiate(chunkPrefab, chunkPosition, Quaternion.identity, transform).GetComponent<Chunk>();
+        allChunks.Add(chunkPosition, chunk);
+        var result = await Task.Run(() =>
         {
-            chunks[position].gameObject.SetActive(true);
+            chunk.CreateMeshData(chunkPosition);
+            chunk.Generate(fuckMinecraft);
+            if (tokenSource.IsCancellationRequested)
+            {
+                return chunk;
+            }
+            return chunk;
+        }, tokenSource.Token);
+        chunk.Draw();
+        if (tokenSource.IsCancellationRequested)
+        {
+            return;
+        }
+
+    }
+
+    void LoadChunk(Vector3 chunkPosition)
+    {
+        if (allChunks.ContainsKey(chunkPosition))
+        {
+            allChunks[chunkPosition].gameObject.SetActive(true);
         }
         else
         {
-            CreateChunk(position);
+            CreateChunkAsync(chunkPosition);
         }
     }
-    
-    void UnloadChunk(Vector3 position)
+
+    void UnloadChunk(Vector3 chunkPosition)
     {
-        if (chunks.ContainsKey(position))
+        if (allChunks.ContainsKey(chunkPosition))
         {
-            chunks[position].gameObject.SetActive(false);
+            allChunks[chunkPosition].gameObject.SetActive(false);
         }
     }
 }

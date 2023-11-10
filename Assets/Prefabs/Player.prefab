@@ -88,7 +88,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 500
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -180,6 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5bb9b341402e83418a5566f7e609cda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prevChunkLocation: {x: 0, y: 0, z: 0}
   chunkLocation: {x: 0, y: 0, z: 0}
   camera: {fileID: 6322392589356012951}
   controller: {fileID: 6322392591172081541}

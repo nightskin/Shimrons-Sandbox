@@ -1,47 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Jobs;
 using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
     public Point[,,] map = null;
+    public Mesh mesh;
+    ChunkManager chunkManager;
 
-    
-    public Vector3 center = Vector3.zero;
-    public float maxHeight = 16;
-
-    public static int tilesXZ = 32;
-    public static int tilesY = 32;
-    public static int tileSize = 2;
-
-
-
-    ChunkManager ChunkManager;
-    Mesh mesh;
 
     List<Vector3> verts = new List<Vector3>();
-    List<Color> colors = new List<Color>();
-    List<Vector2> uvs = new List<Vector2>();
     List<int> tris = new List<int>();
+    List<Color> colors = new List<Color>();
+
     int buffer = 0;
 
     void Awake()
     {
-        ChunkManager = GameObject.Find("ChunkManager").GetComponent<ChunkManager>();
+        chunkManager = GameObject.Find("ChunkManager").GetComponent<ChunkManager>();
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        map = new Point[tilesXZ, tilesY, tilesXZ];
+        map = new Point[chunkManager.tilesPerChunkXZ, chunkManager.tilesPerChunkY, chunkManager.tilesPerChunkXZ];
     }
 
-
-    float Evaluate3D(Vector3 point)
+    float Evaluate(Vector3 point)
     {
-        return ChunkManager.noise.Evaluate(point * ChunkManager.noiseScale);
-    }
-    
-    float Evaluate2D(Vector3 point)
-    {
-        return Mathf.Abs(ChunkManager.noise.Evaluate(point * ChunkManager.noiseScale));
+        return Mathf.Abs(ChunkManager.noise.Evaluate(point * chunkManager.noiseScale));
     }
 
     public void RemoveBlock(Vector3 hit)
@@ -49,11 +34,11 @@ public class Chunk : MonoBehaviour
         Vector3 localPos = hit - transform.position;
         Point closestSpace = map[0, 0, 0];
 
-        for (int x = 0; x < tilesXZ; x++)
+        for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
         {
-            for (int y = 0; y < tilesY; y++)
+            for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
             {
-                for (int z = 0; z < tilesXZ; z++)
+                for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
                 {
                     if (map[x, y, z].active)
                     {
@@ -74,15 +59,14 @@ public class Chunk : MonoBehaviour
         }
         else
         {
-            uvs.Clear();
             verts.Clear();
             tris.Clear();
             colors.Clear();
             buffer = 0;
 
-            if (ChunkManager.noVoxels) CreateVoxels();
+            if (chunkManager.fuckMinecraft) CreateVoxels();
             else MarchingCubes();
-            UpdateMesh();
+            Draw();
         }
 
     }
@@ -92,11 +76,11 @@ public class Chunk : MonoBehaviour
         Vector3 localPos = hit - transform.position;
         Point closestSpace = map[0, 0, 0];
 
-        for (int x = 0; x < tilesXZ; x++)
+        for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
         {
-            for (int y = 0; y < tilesY; y++)
+            for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
             {
-                for (int z = 0; z < tilesXZ; z++)
+                for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
                 {
                     if (!map[x, y, z].active)
                     {
@@ -111,30 +95,59 @@ public class Chunk : MonoBehaviour
 
         map[closestSpace.x, closestSpace.y, closestSpace.z].active = true;
 
-        uvs.Clear();
         verts.Clear();
         tris.Clear();
         colors.Clear();
         buffer = 0;
 
-        if (ChunkManager.noVoxels) CreateVoxels();
+        if (chunkManager.fuckMinecraft) CreateVoxels();
         else MarchingCubes();
-        UpdateMesh();
+        Draw();
     }
 
     public void Generate(bool noVoxels = true)
     {
-        uvs.Clear();
         verts.Clear();
         tris.Clear();
         colors.Clear();
         buffer = 0;
 
-        CreateMap();
         if (noVoxels) MarchingCubes();
         else CreateVoxels();
-        UpdateMesh();
+    }
 
+    public void CreateMeshData(Vector3 center)
+    {
+        for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
+        {
+            for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
+            {
+                for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
+                {
+                    map[x, y, z] = new Point();
+                    map[x, y, z].x = x;
+                    map[x, y, z].y = y;
+                    map[x, y, z].z = z;
+
+                    map[x, y, z].position = new Vector3(x - (chunkManager.tilesPerChunkXZ / 2), y - (chunkManager.tilesPerChunkY / 2), z - (chunkManager.tilesPerChunkXZ / 2)) * (chunkManager.tileSize);
+                    map[x, y, z].height = Evaluate(map[x, y, z].position + center) * chunkManager.maxHeight;
+                    map[x, y, z].color = chunkManager.landGradient.Evaluate(map[x, y, z].height / chunkManager.maxHeight);
+
+                    if (map[x, y, z].height >= y)
+                    {
+                        map[x, y, z].active = true;
+                    }
+
+                    if (y == 0)
+                    {
+                        map[x, y, z].active = true;
+                    }
+
+                    
+
+                }
+            }
+        }
     }
 
     void CreateQuadBack(Vector3 position, float size, Color color)
@@ -151,11 +164,6 @@ public class Chunk : MonoBehaviour
         tris.Add(0 + buffer);
         tris.Add(3 + buffer);
         tris.Add(1 + buffer);
-
-        uvs.Add(new Vector2(0, 0));
-        uvs.Add(new Vector2(1, 0));
-        uvs.Add(new Vector2(0, 1));
-        uvs.Add(new Vector2(1, 1));
 
         colors.Add(color);
         colors.Add(color);
@@ -180,11 +188,6 @@ public class Chunk : MonoBehaviour
         tris.Add(0 + buffer);
         tris.Add(1 + buffer);
 
-        uvs.Add(new Vector2(0, 0));
-        uvs.Add(new Vector2(1, 0));
-        uvs.Add(new Vector2(0, 1));
-        uvs.Add(new Vector2(1, 1));
-
         colors.Add(color);
         colors.Add(color);
         colors.Add(color);
@@ -207,11 +210,6 @@ public class Chunk : MonoBehaviour
         tris.Add(1 + buffer);
         tris.Add(2 + buffer);
         tris.Add(3 + buffer);
-
-        uvs.Add(new Vector2(0, 0));
-        uvs.Add(new Vector2(1, 0));
-        uvs.Add(new Vector2(0, 1));
-        uvs.Add(new Vector2(1, 1));
 
         colors.Add(color);
         colors.Add(color);
@@ -236,11 +234,6 @@ public class Chunk : MonoBehaviour
         tris.Add(1 + buffer);
         tris.Add(3 + buffer);
 
-        uvs.Add(new Vector2(0, 0));
-        uvs.Add(new Vector2(1, 0));
-        uvs.Add(new Vector2(0, 1));
-        uvs.Add(new Vector2(1, 1));
-
         colors.Add(color);
         colors.Add(color);
         colors.Add(color);
@@ -263,11 +256,6 @@ public class Chunk : MonoBehaviour
         tris.Add(3 + buffer);
         tris.Add(1 + buffer);
         tris.Add(2 + buffer);
-
-        uvs.Add(new Vector2(0, 0));
-        uvs.Add(new Vector2(1, 0));
-        uvs.Add(new Vector2(0, 1));
-        uvs.Add(new Vector2(1, 1));
 
         colors.Add(color);
         colors.Add(color);
@@ -293,11 +281,6 @@ public class Chunk : MonoBehaviour
         tris.Add(3 + buffer);
         tris.Add(2 + buffer);
 
-        uvs.Add(new Vector2(0, 0));
-        uvs.Add(new Vector2(1, 0));
-        uvs.Add(new Vector2(0, 1));
-        uvs.Add(new Vector2(1, 1));
-
         colors.Add(color);
         colors.Add(color);
         colors.Add(color);
@@ -307,85 +290,47 @@ public class Chunk : MonoBehaviour
 
     }
 
-    void CreateMap()
-    {
-        for (int x = 0; x < tilesXZ; x++)
-        {
-            for (int y = 0; y < tilesY; y++)
-            {
-                for (int z = 0; z < tilesXZ; z++)
-                {
-                    map[x, y, z] = new Point();
-                    map[x, y, z].x = x;
-                    map[x, y, z].y = y;
-                    map[x, y, z].z = z;
-
-                    map[x, y, z].position = new Vector3(x - (tilesXZ / 2), y - (tilesY / 2), z - (tilesXZ / 2)) * (tileSize);
-                    map[x, y, z].height = Evaluate2D(map[x, y, z].position + center) * maxHeight;
-                    map[x, y, z].value = Evaluate3D(map[x, y, z].position + center);
-
-                    map[x, y, z].color = ChunkManager.landGradient.Evaluate(map[x, y, z].height / maxHeight);
-
-                    if(y <= map[x,y,z].height)
-                    {
-                        if(map[x,y,z].height >= ChunkManager.noiseThreshold)
-                        {
-                            map[x, y, z].active = true;
-                        }
-                    }
-
-                    if(y == 0)
-                    {
-                        map[x, y, z].active = true;
-                    }
-
-                }
-            }
-        }
-
-    }
-
     void CreateVoxels()
     {
-        for (int x = 0; x < tilesXZ; x++)
+        for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
         {
-            for (int y = 0; y < tilesY; y++)
+            for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
             {
-                for (int z = 0; z < tilesXZ; z++)
+                for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
                 {
                     if (map[x, y, z].active)
                     {
-                        if (x < tilesXZ - 1)
+                        if (x < chunkManager.tilesPerChunkXZ - 1)
                         {
-                            if (!map[x + 1, y, z].active) CreateQuadRight(map[x, y, z].position, tileSize, map[x, y, z].color);
+                            if (!map[x + 1, y, z].active) CreateQuadRight(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
                         }
                         if (x > 0)
                         {
-                            if (!map[x - 1, y, z].active) CreateQuadLeft(map[x, y, z].position, tileSize, map[x, y, z].color);
+                            if (!map[x - 1, y, z].active) CreateQuadLeft(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
                         }
-                        if (y < tilesY - 1)
+                        if (y < chunkManager.tilesPerChunkY - 1)
                         {
-                            if (!map[x, y + 1, z].active) CreateQuadTop(map[x, y, z].position, tileSize, map[x, y, z].color);
+                            if (!map[x, y + 1, z].active) CreateQuadTop(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
                         }
                         if (y > 0)
                         {
-                            if (!map[x, y - 1, z].active) CreateQuadBottom(map[x, y, z].position, tileSize, map[x, y, z].color);
+                            if (!map[x, y - 1, z].active) CreateQuadBottom(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
                         }
-                        if (z < tilesXZ - 1)
+                        if (z < chunkManager.tilesPerChunkXZ - 1)
                         {
-                            if (!map[x, y, z + 1].active) CreateQuadFront(map[x, y, z].position, tileSize, map[x, y, z].color);
+                            if (!map[x, y, z + 1].active) CreateQuadFront(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
                         }
                         if (z > 0)
                         {
-                            if (!map[x, y, z - 1].active) CreateQuadBack(map[x, y, z].position, tileSize, map[x, y, z].color);
+                            if (!map[x, y, z - 1].active) CreateQuadBack(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
                         }
 
-                        if (x == 0) CreateQuadLeft(map[x, y, z].position, tileSize, map[x, y, z].color);
-                        if (y == 0) CreateQuadBottom(map[x, y, z].position, tileSize, map[x, y, z].color);
-                        if (z == 0) CreateQuadBack(map[x, y, z].position, tileSize, map[x, y, z].color);
-                        if (x == tilesXZ - 1) CreateQuadRight(map[x, y, z].position, tileSize, map[x, y, z].color);
-                        if (y == tilesY - 1) CreateQuadTop(map[x, y, z].position, tileSize, map[x, y, z].color);
-                        if (z == tilesXZ - 1) CreateQuadFront(map[x, y, z].position, tileSize, map[x, y, z].color);
+                        if (x == 0) CreateQuadLeft(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
+                        if (y == 0) CreateQuadBottom(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
+                        if (z == 0) CreateQuadBack(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
+                        if (x == chunkManager.tilesPerChunkXZ - 1) CreateQuadRight(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
+                        if (y == chunkManager.tilesPerChunkY - 1) CreateQuadTop(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
+                        if (z == chunkManager.tilesPerChunkXZ - 1) CreateQuadFront(map[x, y, z].position, chunkManager.tileSize, map[x, y, z].color);
 
                     }
                 }
@@ -396,13 +341,13 @@ public class Chunk : MonoBehaviour
     void MarchingCubes()
     {
 
-        for (int x = tilesXZ; x > 0; x--)
+        for (int x = chunkManager.tilesPerChunkXZ; x > 0; x--)
         {
-            for (int y = tilesY; y > 0; y--)
+            for (int y = chunkManager.tilesPerChunkY; y > 0; y--)
             {
-                for (int z = tilesXZ; z > 0; z--)
+                for (int z = chunkManager.tilesPerChunkXZ; z > 0; z--)
                 {
-                    if (x < tilesXZ - 1 && y < tilesY - 1 && z < tilesXZ - 1)
+                    if (x < chunkManager.tilesPerChunkXZ - 1 && y < chunkManager.tilesPerChunkY - 1 && z < chunkManager.tilesPerChunkXZ - 1)
                     {
                         Point[] points = new Point[]
                         {
@@ -461,6 +406,7 @@ public class Chunk : MonoBehaviour
         return (point1.position + point2.position) / 2;
     }
 
+
     Color GetMidPointColor(Point point1, Point point2)
     {
         return (point1.color + point2.color) / 2;
@@ -468,11 +414,11 @@ public class Chunk : MonoBehaviour
 
     bool BlocksGone()
     {
-        for (int x = 0; x < tilesXZ; x++)
+        for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
         {
-            for (int y = 0; y < tilesY; y++)
+            for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
             {
-                for (int z = 0; z < tilesXZ; z++)
+                for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
                 {
                     if (map[x, y, z].active) return false;
                 }
@@ -482,13 +428,12 @@ public class Chunk : MonoBehaviour
         return true;
     }
 
-    void UpdateMesh()
+    public void Draw()
     {
         mesh.Clear();
         mesh.vertices = verts.ToArray();
         mesh.triangles = tris.ToArray();
         mesh.colors = colors.ToArray();
-        mesh.uv = uvs.ToArray();
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         GetComponent<MeshCollider>().sharedMesh = mesh;

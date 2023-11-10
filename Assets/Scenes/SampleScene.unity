@@ -261,8 +261,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6393de5be8e22f149934231fec75ac18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 0
-  noVoxels: 1
+  seed: DickButt
+  fuckMinecraft: 1
   landGradient:
     serializedVersion: 2
     key0: {r: 0.5849056, g: 0.24537724, b: 0, a: 1}
@@ -292,9 +292,12 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 5
     m_NumAlphaKeys: 2
-  noiseScale: 0.005
+  maxHeight: 16
+  tilesPerChunkXZ: 32
+  tilesPerChunkY: 32
+  tileSize: 2
+  noiseScale: 0.0025
   noiseThreshold: 0.5
-  maxViewDistance: 500
   player: {fileID: 1661624706}
   chunkPrefab: {fileID: 891923478942689952, guid: cd783e17584ff174cab45bc11d5dbf70, type: 3}
 --- !u!114 &1661624706 stripped

@@ -6,7 +6,6 @@ public class Point
 {
     public Color color = new Color();
     public bool active = false;
-    public float value = 0;
     public float height = 0;
     public Vector3 position = new Vector3();
     public int x;
