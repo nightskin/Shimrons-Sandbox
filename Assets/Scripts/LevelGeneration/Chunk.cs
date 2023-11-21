@@ -64,7 +64,7 @@ public class Chunk : MonoBehaviour
             colors.Clear();
             buffer = 0;
 
-            if (chunkManager.fuckMinecraft) CreateVoxels();
+            if (chunkManager.getRidOfBlocksCuzTheySuck) CreateVoxels();
             else MarchingCubes();
             Draw();
         }
@@ -100,7 +100,7 @@ public class Chunk : MonoBehaviour
         colors.Clear();
         buffer = 0;
 
-        if (chunkManager.fuckMinecraft) CreateVoxels();
+        if (chunkManager.getRidOfBlocksCuzTheySuck) CreateVoxels();
         else MarchingCubes();
         Draw();
     }
@@ -130,21 +130,13 @@ public class Chunk : MonoBehaviour
                     map[x, y, z].z = z;
 
                     map[x, y, z].position = new Vector3(x - (chunkManager.tilesPerChunkXZ / 2), y - (chunkManager.tilesPerChunkY / 2), z - (chunkManager.tilesPerChunkXZ / 2)) * (chunkManager.tileSize);
-                    map[x, y, z].height = Evaluate(map[x, y, z].position + center) * chunkManager.maxHeight;
-                    map[x, y, z].color = chunkManager.landGradient.Evaluate(map[x, y, z].height / chunkManager.maxHeight);
+                    map[x, y, z].height = Evaluate(map[x, y, z].position + center) * chunkManager.tilesPerChunkY;
+                    map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.tilesPerChunkY);
 
                     if (map[x, y, z].height >= y)
                     {
                         map[x, y, z].active = true;
                     }
-
-                    if (y == 0)
-                    {
-                        map[x, y, z].active = true;
-                    }
-
-                    
-
                 }
             }
         }

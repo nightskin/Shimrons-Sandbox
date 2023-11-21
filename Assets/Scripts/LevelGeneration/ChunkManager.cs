@@ -6,7 +6,7 @@ using UnityEngine;
 public class ChunkManager : MonoBehaviour
 {
     public string seed = "";
-    public bool fuckMinecraft = true;
+    public bool getRidOfBlocksCuzTheySuck = true;
     public Gradient landGradient;
     public float maxHeight = 16;
     public int tilesPerChunkXZ = 32;
@@ -88,7 +88,7 @@ public class ChunkManager : MonoBehaviour
         var chunk = Instantiate(chunkPrefab, chunkPosition, Quaternion.identity, transform).GetComponent<Chunk>();
         allChunks.Add(chunkPosition, chunk);
         chunk.CreateMeshData(chunkPosition);
-        chunk.Generate(fuckMinecraft);
+        chunk.Generate(getRidOfBlocksCuzTheySuck);
         chunk.Draw();
     }
 
@@ -99,7 +99,7 @@ public class ChunkManager : MonoBehaviour
         var result = await Task.Run(() =>
         {
             chunk.CreateMeshData(chunkPosition);
-            chunk.Generate(fuckMinecraft);
+            chunk.Generate(getRidOfBlocksCuzTheySuck);
             if (tokenSource.IsCancellationRequested)
             {
                 return chunk;

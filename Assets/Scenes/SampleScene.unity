@@ -262,7 +262,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   seed: DickButt
-  fuckMinecraft: 1
+  getRidOfBlocksCuzTheySuck: 0
   landGradient:
     serializedVersion: 2
     key0: {r: 0.5849056, g: 0.24537724, b: 0, a: 1}
@@ -321,6 +321,10 @@ PrefabInstance:
     - target: {fileID: 6322392591172081536, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 6322392591172081541, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
+      propertyPath: m_StepOffset
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_RootOrder
