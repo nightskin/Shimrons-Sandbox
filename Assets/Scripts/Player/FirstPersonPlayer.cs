@@ -46,12 +46,38 @@ public class FirstPersonPlayer : MonoBehaviour
         actions.Enable();
 
         actions.Jump.performed += Jump_performed;
+        actions.PrimaryFire.performed += PrimaryFire_performed;
+        actions.SecondaryFire.performed += SecondaryFire_performed;
     }
 
     void Update()
     {
         Look();
         Movement();
+    }
+
+    private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if(Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
+        {
+
+        }
+
+    }
+
+    private void SecondaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit, 500, groundMask))
+        {
+            if(hit.collider.tag == "Ground")
+            {
+                Chunk chunk = hit.collider.GetComponent<Chunk>();
+                if(chunk)
+                {
+                    chunk.RemoveBlock(hit.point);
+                }
+            }
+        }
     }
 
     void Jump_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)

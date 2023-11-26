@@ -24,7 +24,7 @@ public class Chunk : MonoBehaviour
         map = new Point[chunkManager.tilesPerChunkXZ, chunkManager.tilesPerChunkY, chunkManager.tilesPerChunkXZ];
     }
 
-    float Evaluate(Vector3 point)
+    float Evaluate3D(Vector3 point)
     {
         return Mathf.Abs(ChunkManager.noise.Evaluate(point * chunkManager.noiseScale));
     }
@@ -51,7 +51,7 @@ public class Chunk : MonoBehaviour
             }
         }
 
-        map[closestSpace.x, closestSpace.y, closestSpace.z].active = false;
+        if(closestSpace.y > 0) map[closestSpace.x, closestSpace.y, closestSpace.z].active = false;
 
         if (BlocksGone())
         {
@@ -64,8 +64,8 @@ public class Chunk : MonoBehaviour
             colors.Clear();
             buffer = 0;
 
-            if (chunkManager.getRidOfBlocksCuzTheySuck) CreateVoxels();
-            else MarchingCubes();
+            if (chunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
+            else CreateVoxels();
             Draw();
         }
 
@@ -105,7 +105,7 @@ public class Chunk : MonoBehaviour
         Draw();
     }
 
-    public void Generate(bool noVoxels = true)
+    public void CreateMeshData(bool noVoxels = true)
     {
         verts.Clear();
         tris.Clear();
@@ -116,7 +116,7 @@ public class Chunk : MonoBehaviour
         else CreateVoxels();
     }
 
-    public void CreateMeshData(Vector3 center)
+    public void CreateVoxelData(Vector3 center)
     {
         for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
         {
@@ -130,13 +130,42 @@ public class Chunk : MonoBehaviour
                     map[x, y, z].z = z;
 
                     map[x, y, z].position = new Vector3(x - (chunkManager.tilesPerChunkXZ / 2), y - (chunkManager.tilesPerChunkY / 2), z - (chunkManager.tilesPerChunkXZ / 2)) * (chunkManager.tileSize);
-                    map[x, y, z].height = Evaluate(map[x, y, z].position + center) * chunkManager.tilesPerChunkY;
-                    map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.tilesPerChunkY);
-
-                    if (map[x, y, z].height >= y)
+                    
+                    if(y > chunkManager.landLevel)
                     {
+                        map[x, y, z].value = Evaluate3D(map[x, y, z].position + center) * (chunkManager.tilesPerChunkY - 1);
+                        map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.tilesPerChunkY);
+
+                        if (map[x, y, z].value <= y)
+                        {
+                            map[x, y, z].active = false;
+                        }
+                    }
+                    else if(y < chunkManager.landLevel)
+                    {
+                        map[x, y, z].value = Evaluate3D(map[x, y, z].position + center);
+                        map[x, y, z].color = chunkManager.underGroundColor;
+
+                        if (map[x,y,z].value >= chunkManager.noiseThreshold)
+                        {
+                            map[x, y, z].active = false;
+                        }
+
+                    }
+                    else if(y == chunkManager.landLevel)
+                    {
+                        map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.tilesPerChunkY);
+                        map[x,y,z].active = true;
+                    }
+
+                    if(y == 0)
+                    {
+                        map[x, y, z].color = chunkManager.bedrockColor;
                         map[x, y, z].active = true;
                     }
+
+
+
                 }
             }
         }
@@ -361,7 +390,7 @@ public class Chunk : MonoBehaviour
                                 int a = MarchingCubesTables.edgeConnections[edgeIndex][0];
                                 int b = MarchingCubesTables.edgeConnections[edgeIndex][1];
 
-                                Vector3 vertexPos = GetMidPoint(points[a], points[b]);
+                                Vector3 vertexPos = (points[a].position + points[b].position) / 2;
 
                                 verts.Add(vertexPos);
                                 tris.Add(buffer);
@@ -392,12 +421,6 @@ public class Chunk : MonoBehaviour
         if (points[7].active) state |= 128;
         return state;
     }
-
-    Vector3 GetMidPoint(Point point1, Point point2)
-    {
-        return (point1.position + point2.position) / 2;
-    }
-
 
     Color GetMidPointColor(Point point1, Point point2)
     {

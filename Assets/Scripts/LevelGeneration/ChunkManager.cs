@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -8,17 +9,19 @@ public class ChunkManager : MonoBehaviour
     public string seed = "";
     public bool getRidOfBlocksCuzTheySuck = true;
     public Gradient landGradient;
-    public float maxHeight = 16;
+    public Color underGroundColor;
+    public Color bedrockColor;
+    public float landLevel = 16;
     public int tilesPerChunkXZ = 32;
     public int tilesPerChunkY = 32;
-    public int tileSize = 3;
+    public float tileSize = 2;
 
     public static Noise noise;
     public static float chunkSize = 0;
-    public float noiseScale = 0.0025f;
     public float noiseThreshold = 0.5f;
+    public float noiseScale = 0.0025f;
 
-    float maxViewDistance;
+    [SerializeField] float maxViewDistance = 100;
     [SerializeField] FirstPersonPlayer player;
     [SerializeField] GameObject chunkPrefab;
 
@@ -29,7 +32,6 @@ public class ChunkManager : MonoBehaviour
 
     void Awake()
     {
-        maxViewDistance = Camera.main.farClipPlane;
         if (seed == string.Empty) seed = System.DateTime.Now.ToString();
         noise = new Noise(seed.GetHashCode());
         if (!player) player = GameObject.FindGameObjectWithTag("Player").GetComponent<FirstPersonPlayer>();
@@ -87,8 +89,8 @@ public class ChunkManager : MonoBehaviour
     {
         var chunk = Instantiate(chunkPrefab, chunkPosition, Quaternion.identity, transform).GetComponent<Chunk>();
         allChunks.Add(chunkPosition, chunk);
-        chunk.CreateMeshData(chunkPosition);
-        chunk.Generate(getRidOfBlocksCuzTheySuck);
+        chunk.CreateVoxelData(chunkPosition);
+        chunk.CreateMeshData(getRidOfBlocksCuzTheySuck);
         chunk.Draw();
     }
 
@@ -98,8 +100,8 @@ public class ChunkManager : MonoBehaviour
         allChunks.Add(chunkPosition, chunk);
         var result = await Task.Run(() =>
         {
-            chunk.CreateMeshData(chunkPosition);
-            chunk.Generate(getRidOfBlocksCuzTheySuck);
+            chunk.CreateVoxelData(chunkPosition);
+            chunk.CreateMeshData(getRidOfBlocksCuzTheySuck);
             if (tokenSource.IsCancellationRequested)
             {
                 return chunk;

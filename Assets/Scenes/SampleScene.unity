@@ -261,22 +261,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6393de5be8e22f149934231fec75ac18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: DickButt
-  getRidOfBlocksCuzTheySuck: 0
+  seed: 69
+  getRidOfBlocksCuzTheySuck: 1
   landGradient:
     serializedVersion: 2
-    key0: {r: 0.5849056, g: 0.24537724, b: 0, a: 1}
-    key1: {r: 1, g: 0.74600756, b: 0.5424528, a: 1}
-    key2: {r: 0, g: 0.5, b: 0, a: 0}
-    key3: {r: 0.5, g: 0.5, b: 0.5, a: 0}
+    key0: {r: 1, g: 0.74600756, b: 0.5424528, a: 1}
+    key1: {r: 0, g: 0.5, b: 0, a: 1}
+    key2: {r: 0.5, g: 0.5, b: 0.5, a: 0}
+    key3: {r: 1, g: 1, b: 1, a: 0}
     key4: {r: 1, g: 1, b: 1, a: 0}
     key5: {r: 0, g: 0, b: 0, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 16384
-    ctime2: 32768
-    ctime3: 49151
+    ctime0: 16384
+    ctime1: 32768
+    ctime2: 49151
+    ctime3: 65535
     ctime4: 65535
     ctime5: 0
     ctime6: 0
@@ -290,14 +290,17 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 5
+    m_NumColorKeys: 4
     m_NumAlphaKeys: 2
-  maxHeight: 16
+  underGroundColor: {r: 0.6, g: 0.3, b: 0, a: 1}
+  bedrockColor: {r: 0.3490566, g: 0.175669, b: 0, a: 1}
+  landLevel: 16
   tilesPerChunkXZ: 32
-  tilesPerChunkY: 32
+  tilesPerChunkY: 64
   tileSize: 2
-  noiseScale: 0.0025
   noiseThreshold: 0.5
+  noiseScale: 0.0025
+  maxViewDistance: 500
   player: {fileID: 1661624706}
   chunkPrefab: {fileID: 891923478942689952, guid: cd783e17584ff174cab45bc11d5dbf70, type: 3}
 --- !u!114 &1661624706 stripped
@@ -321,6 +324,10 @@ PrefabInstance:
     - target: {fileID: 6322392591172081536, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 6322392591172081540, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
+      propertyPath: groundMask.m_Bits
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 6322392591172081541, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_StepOffset

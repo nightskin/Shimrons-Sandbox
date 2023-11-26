@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7043771588455345861}
   m_Layer: 3
   m_Name: Chunk
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -111,5 +111,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 223f0d02288cf104da4651373aee0d4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 0, z: 0}
-  maxHeight: 16
+  mesh: {fileID: 0}
