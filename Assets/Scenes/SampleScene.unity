@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 705507995}
   - component: {fileID: 705507994}
   m_Layer: 0
-  m_Name: Directional Light
+  m_Name: Sun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -296,9 +296,9 @@ MonoBehaviour:
   bedrockColor: {r: 0.3490566, g: 0.175669, b: 0, a: 1}
   landLevel: 16
   tilesPerChunkXZ: 32
-  tilesPerChunkY: 64
+  tilesPerChunkY: 32
   tileSize: 2
-  noiseThreshold: 0.5
+  noiseThreshold: 0.1
   noiseScale: 0.0025
   maxViewDistance: 500
   player: {fileID: 1661624706}

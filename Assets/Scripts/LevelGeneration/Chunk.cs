@@ -21,7 +21,7 @@ public class Chunk : MonoBehaviour
         chunkManager = GameObject.Find("ChunkManager").GetComponent<ChunkManager>();
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        map = new Point[chunkManager.tilesPerChunkXZ, chunkManager.tilesPerChunkY, chunkManager.tilesPerChunkXZ];
+        //map = new Point[chunkManager.tilesPerChunkXZ, chunkManager.tilesPerChunkY, chunkManager.tilesPerChunkXZ];
     }
 
     float Evaluate3D(Vector3 point)
@@ -118,6 +118,7 @@ public class Chunk : MonoBehaviour
 
     public void CreateVoxelData(Vector3 center)
     {
+        map = new Point[chunkManager.tilesPerChunkXZ, chunkManager.tilesPerChunkY, chunkManager.tilesPerChunkXZ];
         for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
         {
             for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
@@ -130,33 +131,15 @@ public class Chunk : MonoBehaviour
                     map[x, y, z].z = z;
 
                     map[x, y, z].position = new Vector3(x - (chunkManager.tilesPerChunkXZ / 2), y - (chunkManager.tilesPerChunkY / 2), z - (chunkManager.tilesPerChunkXZ / 2)) * (chunkManager.tileSize);
-                    
-                    if(y > chunkManager.landLevel)
-                    {
-                        map[x, y, z].value = Evaluate3D(map[x, y, z].position + center) * (chunkManager.tilesPerChunkY - 1);
-                        map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.tilesPerChunkY);
 
-                        if (map[x, y, z].value <= y)
-                        {
-                            map[x, y, z].active = false;
-                        }
-                    }
-                    else if(y < chunkManager.landLevel)
-                    {
-                        map[x, y, z].value = Evaluate3D(map[x, y, z].position + center);
-                        map[x, y, z].color = chunkManager.underGroundColor;
+                    map[x, y, z].value = Evaluate3D(map[x, y, z].position + center) * (chunkManager.tilesPerChunkY - 1);
+                    map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.tilesPerChunkY);
 
-                        if (map[x,y,z].value >= chunkManager.noiseThreshold)
-                        {
-                            map[x, y, z].active = false;
-                        }
-
-                    }
-                    else if(y == chunkManager.landLevel)
+                    if (map[x, y, z].value >= y)
                     {
-                        map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.tilesPerChunkY);
-                        map[x,y,z].active = true;
+                        map[x, y, z].active = true;
                     }
+
 
                     if(y == 0)
                     {
