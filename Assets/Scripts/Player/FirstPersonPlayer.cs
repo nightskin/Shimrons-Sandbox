@@ -54,6 +54,22 @@ public class FirstPersonPlayer : MonoBehaviour
     {
         Look();
         Movement();
+
+        if(actions.SecondaryFire.IsPressed())
+        {
+            if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit, 500, groundMask))
+            {
+                if (hit.collider.tag == "Ground")
+                {
+                    Chunk chunk = hit.collider.GetComponent<Chunk>();
+                    if (chunk)
+                    {
+                        chunk.RemoveBlock(hit.point);
+                    }
+                }
+            }
+        }
+
     }
 
     private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -67,17 +83,7 @@ public class FirstPersonPlayer : MonoBehaviour
 
     private void SecondaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit, 500, groundMask))
-        {
-            if(hit.collider.tag == "Ground")
-            {
-                Chunk chunk = hit.collider.GetComponent<Chunk>();
-                if(chunk)
-                {
-                    chunk.RemoveBlock(hit.point);
-                }
-            }
-        }
+
     }
 
     void Jump_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)

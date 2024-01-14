@@ -297,7 +297,7 @@ MonoBehaviour:
   landLevel: 16
   tilesPerChunkXZ: 32
   tilesPerChunkY: 32
-  tileSize: 2
+  tileSize: 5
   noiseThreshold: 0.1
   noiseScale: 0.0025
   maxViewDistance: 500

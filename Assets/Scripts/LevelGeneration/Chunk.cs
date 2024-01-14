@@ -141,10 +141,9 @@ public class Chunk : MonoBehaviour
                     }
 
 
-                    if(y == 0)
+                    if(x == 0 || x == chunkManager.tilesPerChunkXZ - 2|| z == 0 || z == chunkManager.tilesPerChunkXZ - 2)
                     {
-                        map[x, y, z].color = chunkManager.bedrockColor;
-                        map[x, y, z].active = true;
+                        map[x,y,z].active = false;
                     }
 
 

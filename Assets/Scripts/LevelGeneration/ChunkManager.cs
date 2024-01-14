@@ -35,7 +35,7 @@ public class ChunkManager : MonoBehaviour
         if (seed == string.Empty) seed = System.DateTime.Now.ToString();
         noise = new Noise(seed.GetHashCode());
         if (!player) player = GameObject.FindGameObjectWithTag("Player").GetComponent<FirstPersonPlayer>();
-        chunkSize = tilesPerChunkXZ * tileSize - 10;
+        chunkSize = tilesPerChunkXZ * tileSize - 20;
         chunksXZ = Mathf.RoundToInt(maxViewDistance / chunkSize);
     }
 
