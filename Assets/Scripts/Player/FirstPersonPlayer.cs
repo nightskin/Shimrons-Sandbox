@@ -15,7 +15,7 @@ public class FirstPersonPlayer : MonoBehaviour
     //Components
     public Transform camera;
     [SerializeField] CharacterController controller;
-    [SerializeField] Transform groundCheck;
+    [SerializeField] Transform cameraBob;
 
     // For basic motion
     Vector3 moveDirection;
@@ -23,19 +23,9 @@ public class FirstPersonPlayer : MonoBehaviour
 
 
     //For Look/Aim
-    public Vector2 lookSpeed = new Vector2(100f, 100);
+    public float lookSpeed = 100;
     float xRot = 0;
     float yRot = 0;
-
-    // For Jumping
-    [SerializeField] float jumpHeight = 5;
-    [SerializeField] Vector3 velocity = new Vector3();
-    [SerializeField] float gravity = -9.81f;
-    [SerializeField] LayerMask groundMask;
-
-    bool isGrounded = false;
-    float groundDistance = 0.4f;
-
 
 
     void Awake()
@@ -45,7 +35,7 @@ public class FirstPersonPlayer : MonoBehaviour
         actions = controls.Player;
         actions.Enable();
 
-        actions.Jump.performed += Jump_performed;
+        actions.Dash.performed += Dash_performed;
         actions.PrimaryFire.performed += PrimaryFire_performed;
         actions.SecondaryFire.performed += SecondaryFire_performed;
     }
@@ -54,31 +44,21 @@ public class FirstPersonPlayer : MonoBehaviour
     {
         Look();
         Movement();
-
-        if(actions.SecondaryFire.IsPressed())
-        {
-            if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit, 500, groundMask))
-            {
-                if (hit.collider.tag == "Ground")
-                {
-                    Chunk chunk = hit.collider.GetComponent<Chunk>();
-                    if (chunk)
-                    {
-                        chunk.RemoveBlock(hit.point);
-                    }
-                }
-            }
-        }
-
     }
 
     private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if(Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
+        if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
         {
-
+            if (hit.transform.gameObject.layer == 3)
+            {
+                Chunk chunk = hit.transform.GetComponent<Chunk>();
+                if (chunk)
+                {
+                    chunk.RemoveBlocks(hit.point);
+                }
+            }
         }
-
     }
 
     private void SecondaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -86,47 +66,33 @@ public class FirstPersonPlayer : MonoBehaviour
 
     }
 
-    void Jump_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    void Dash_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if (isGrounded)
-        {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
-        }
+        
     }
 
     void Movement()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        if(isGrounded && velocity.y < 0)
-        {
-            velocity.y = 0;
-        }
 
         //Basic Motion
         float x = actions.Move.ReadValue<Vector2>().x;
+        float y = actions.StrafeY.ReadValue<float>();
         float z = actions.Move.ReadValue<Vector2>().y;
 
         //Move Normally
-        moveDirection = transform.right * x + transform.forward * z;
+        moveDirection = camera.transform.right * x + camera.transform.forward * z + camera.transform.up * y;
         controller.Move(moveDirection * speed * Time.deltaTime);
 
-        //Apply Gravity
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
 
-
-
-        if(actions.Move.ReadValue<Vector2>().magnitude > 0)
+        if (actions.Move.ReadValue<Vector2>().magnitude > 0)
         {
-            prevChunkLocation = chunkLocation;
 
+            prevChunkLocation = chunkLocation;
             //Calculate ChunkPos
             float chunkPosX = Mathf.Round(transform.position.x / ChunkManager.chunkSize) * ChunkManager.chunkSize;
             float chunkPosZ = Mathf.Round(transform.position.z / ChunkManager.chunkSize) * ChunkManager.chunkSize;
             chunkLocation = new Vector3(chunkPosX, 0, chunkPosZ);
         }
-
 
 
     }
@@ -135,13 +101,17 @@ public class FirstPersonPlayer : MonoBehaviour
     {
         float x = actions.Look.ReadValue<Vector2>().x;
         float y = actions.Look.ReadValue<Vector2>().y;
-        //Looking up/down with camera
-        xRot -= y * lookSpeed.y * Time.deltaTime;
+
+        //Looking up/down
+        xRot -= y * lookSpeed * Time.deltaTime;
         xRot = Mathf.Clamp(xRot, -90, 90);
-        camera.localEulerAngles = new Vector3(xRot, 0, 0);
-        //Looking left right with player body
-        yRot += x * lookSpeed.x * Time.deltaTime;
+
+        //Looking left/right
+        yRot += x * lookSpeed * Time.deltaTime;
+
         transform.localEulerAngles = new Vector3(0, yRot, 0);
+        camera.localEulerAngles = new Vector3(xRot, 0, 0);
+
     }
 
     

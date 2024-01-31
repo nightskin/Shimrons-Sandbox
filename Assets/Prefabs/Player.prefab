@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 509730710}
   m_Layer: 0
-  m_Name: GroundCheck
+  m_Name: CameraBob
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24,12 +24,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 509730709}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6322392589356012951}
   m_Father: {fileID: 6322392591172081543}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6322392589356012946
 GameObject:
@@ -57,11 +58,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6322392589356012946}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6322392591172081543}
+  m_Father: {fileID: 509730710}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &6322392589356012944
@@ -88,7 +89,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 500
+  far clip plane: 1000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -145,7 +146,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6322392589356012951}
   - {fileID: 509730710}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -161,10 +161,10 @@ CharacterController:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Height: 2
+  m_Height: 1
   m_Radius: 0.5
   m_SlopeLimit: 65
-  m_StepOffset: 0.3
+  m_StepOffset: 1
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
@@ -184,12 +184,6 @@ MonoBehaviour:
   chunkLocation: {x: 0, y: 0, z: 0}
   camera: {fileID: 6322392589356012951}
   controller: {fileID: 6322392591172081541}
-  groundCheck: {fileID: 509730710}
-  speed: 30
-  lookSpeed: {x: 200, y: 200}
-  jumpHeight: 5
-  velocity: {x: 0, y: 0, z: 0}
-  gravity: -19.62
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 8
+  cameraBob: {fileID: 509730710}
+  speed: 50
+  lookSpeed: 100

@@ -20,8 +20,8 @@ public class Chunk : MonoBehaviour
     {
         chunkManager = GameObject.Find("ChunkManager").GetComponent<ChunkManager>();
         mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
-        //map = new Point[chunkManager.tilesPerChunkXZ, chunkManager.tilesPerChunkY, chunkManager.tilesPerChunkXZ];
     }
 
     float Evaluate3D(Vector3 point)
@@ -29,10 +29,16 @@ public class Chunk : MonoBehaviour
         return Mathf.Abs(ChunkManager.noise.Evaluate(point * chunkManager.noiseScale));
     }
 
-    public void RemoveBlock(Vector3 hit)
+    float Evaluate2D(Vector3 point)
     {
+        Vector3 p = new Vector3(point.x, 0, point.z);
+        return Mathf.Abs(ChunkManager.noise.Evaluate(p * chunkManager.noiseScale));
+    }
+
+    public void RemoveBlocks(Vector3 hit)
+    {
+        float radius = chunkManager.tileSize;
         Vector3 localPos = hit - transform.position;
-        Point closestSpace = map[0, 0, 0];
 
         for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
         {
@@ -42,67 +48,24 @@ public class Chunk : MonoBehaviour
                 {
                     if (map[x, y, z].active)
                     {
-                        if (Vector3.Distance(map[x, y, z].position, localPos) < Vector3.Distance(closestSpace.position, localPos))
+                        if (Vector3.Distance(map[x, y, z].position, localPos) <= radius)
                         {
-                            closestSpace = map[x, y, z];
+                            map[x, y, z].active = false;
                         }
                     }
                 }
             }
         }
-
-        if(closestSpace.y > 0) map[closestSpace.x, closestSpace.y, closestSpace.z].active = false;
-
-        if (BlocksGone())
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            verts.Clear();
-            tris.Clear();
-            colors.Clear();
-            buffer = 0;
-
-            if (chunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
-            else CreateVoxels();
-            Draw();
-        }
-
-    }
-
-    public void AddBlock(Vector3 hit)
-    {
-        Vector3 localPos = hit - transform.position;
-        Point closestSpace = map[0, 0, 0];
-
-        for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
-        {
-            for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
-            {
-                for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
-                {
-                    if (!map[x, y, z].active)
-                    {
-                        if (Vector3.Distance(map[x, y, z].position, localPos) < Vector3.Distance(closestSpace.position, localPos))
-                        {
-                            closestSpace = map[x, y, z];
-                        }
-                    }
-                }
-            }
-        }
-
-        map[closestSpace.x, closestSpace.y, closestSpace.z].active = true;
 
         verts.Clear();
         tris.Clear();
         colors.Clear();
         buffer = 0;
 
-        if (chunkManager.getRidOfBlocksCuzTheySuck) CreateVoxels();
-        else MarchingCubes();
+        if (chunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
+        else CreateVoxels();
         Draw();
+
     }
 
     public void CreateMeshData(bool noVoxels = true)
@@ -121,9 +84,9 @@ public class Chunk : MonoBehaviour
         map = new Point[chunkManager.tilesPerChunkXZ, chunkManager.tilesPerChunkY, chunkManager.tilesPerChunkXZ];
         for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
         {
-            for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
+            for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
             {
-                for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
+                for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
                 {
                     map[x, y, z] = new Point();
                     map[x, y, z].x = x;
@@ -131,22 +94,31 @@ public class Chunk : MonoBehaviour
                     map[x, y, z].z = z;
 
                     map[x, y, z].position = new Vector3(x - (chunkManager.tilesPerChunkXZ / 2), y - (chunkManager.tilesPerChunkY / 2), z - (chunkManager.tilesPerChunkXZ / 2)) * (chunkManager.tileSize);
-
-                    map[x, y, z].value = Evaluate3D(map[x, y, z].position + center) * (chunkManager.tilesPerChunkY - 1);
                     map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.tilesPerChunkY);
 
-                    if (map[x, y, z].value >= y)
+                    if(y <= chunkManager.surfaceLevel)
                     {
-                        map[x, y, z].active = true;
+                        map[x,y,z].height = chunkManager.surfaceLevel;
+                    }
+                    else
+                    {
+                        map[x, y, z].height = Evaluate2D(map[x, y, z].position + center) * (chunkManager.tilesPerChunkY - 2);
                     }
 
 
-                    if(x == 0 || x == chunkManager.tilesPerChunkXZ - 2|| z == 0 || z == chunkManager.tilesPerChunkXZ - 2)
+                    if (map[x,y,z].height >= y)
+                    {
+                        map[x,y,z].active = true;
+                    }
+                    else
+                    {
+                        map[x, y, z].active = false;
+                    }
+                    
+                    if(x == 0 || x == chunkManager.tilesPerChunkXZ - 2 || z == 0 || z == chunkManager.tilesPerChunkXZ - 2)
                     {
                         map[x,y,z].active = false;
                     }
-
-
 
                 }
             }
@@ -372,7 +344,18 @@ public class Chunk : MonoBehaviour
                                 int a = MarchingCubesTables.edgeConnections[edgeIndex][0];
                                 int b = MarchingCubesTables.edgeConnections[edgeIndex][1];
 
-                                Vector3 vertexPos = (points[a].position + points[b].position) / 2;
+                                Vector3 vertexPos;
+                                if(chunkManager.smoothing)
+                                {
+                                    float level = Mathf.Max(points[a].y, points[b].y);
+                                    float amount = (level - points[a].height) / (points[b].height - points[a].height);
+                                    vertexPos = Vector3.Lerp(points[a].position, points[b].position, amount);
+                                }
+                                else
+                                {
+                                    vertexPos = (points[a].position + points[b].position) / 2;
+                                }
+
 
                                 verts.Add(vertexPos);
                                 tris.Add(buffer);
@@ -407,22 +390,6 @@ public class Chunk : MonoBehaviour
     Color GetMidPointColor(Point point1, Point point2)
     {
         return (point1.color + point2.color) / 2;
-    }
-
-    bool BlocksGone()
-    {
-        for (int x = 0; x < chunkManager.tilesPerChunkXZ; x++)
-        {
-            for (int y = 0; y < chunkManager.tilesPerChunkY; y++)
-            {
-                for (int z = 0; z < chunkManager.tilesPerChunkXZ; z++)
-                {
-                    if (map[x, y, z].active) return false;
-                }
-            }
-        }
-
-        return true;
     }
 
     public void Draw()

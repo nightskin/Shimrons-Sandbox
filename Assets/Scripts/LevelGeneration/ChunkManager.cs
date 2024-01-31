@@ -8,17 +8,16 @@ public class ChunkManager : MonoBehaviour
 {
     public string seed = "";
     public bool getRidOfBlocksCuzTheySuck = true;
+    public bool smoothing = false;
     public Gradient landGradient;
-    public Color underGroundColor;
-    public Color bedrockColor;
-    public float landLevel = 16;
+
     public int tilesPerChunkXZ = 32;
     public int tilesPerChunkY = 32;
     public float tileSize = 2;
 
     public static Noise noise;
     public static float chunkSize = 0;
-    public float noiseThreshold = 0.5f;
+    public float surfaceLevel = 16;
     public float noiseScale = 0.0025f;
 
     [SerializeField] float maxViewDistance = 100;
@@ -32,10 +31,12 @@ public class ChunkManager : MonoBehaviour
 
     void Awake()
     {
+
         if (seed == string.Empty) seed = System.DateTime.Now.ToString();
         noise = new Noise(seed.GetHashCode());
         if (!player) player = GameObject.FindGameObjectWithTag("Player").GetComponent<FirstPersonPlayer>();
-        chunkSize = tilesPerChunkXZ * tileSize - 20;
+        maxViewDistance = Camera.main.farClipPlane;
+        chunkSize = (tilesPerChunkXZ - 4) * tileSize;
         chunksXZ = Mathf.RoundToInt(maxViewDistance / chunkSize);
     }
 
@@ -76,6 +77,19 @@ public class ChunkManager : MonoBehaviour
                 {
                     UnloadChunk(position);
                 }
+            }
+        }
+    }
+
+    void OnValidate()
+    {
+        if(Application.isPlaying)
+        {
+            foreach(Vector3 position in allChunks.Keys)
+            {
+                allChunks[position].CreateVoxelData(position);
+                allChunks[position].CreateMeshData();
+                allChunks[position].Draw();
             }
         }
     }

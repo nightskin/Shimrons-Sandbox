@@ -15,29 +15,20 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "StrafeY",
+                    "type": "PassThrough",
+                    "id": "e08011c4-4f29-4b09-9861-5a8c3f0514d8",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Look",
                     "type": "PassThrough",
                     "id": "015fcb02-65a4-4a11-bbb3-b9c08c7806d0",
                     "expectedControlType": "Vector2",
                     "processors": "NormalizeVector2",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Dash",
-                    "type": "Button",
-                    "id": "f45c89b7-0a38-4aae-aad9-99b63fb32775",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "Jump",
-                    "type": "Button",
-                    "id": "1f7e1777-0f72-46ef-a4b8-09f96ec1aaa0",
-                    "expectedControlType": "Button",
-                    "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
@@ -63,6 +54,15 @@
                     "name": "SecondaryFire",
                     "type": "Button",
                     "id": "6449aa72-1b91-413f-b190-91bed85bfee4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Dash",
+                    "type": "Button",
+                    "id": "a58d3ea1-9f13-43f3-88f4-e3c44a8b26d1",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -160,56 +160,12 @@
                 },
                 {
                     "name": "",
-                    "id": "4cfa6049-3089-446b-b21d-4d39a636352c",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Dash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "c4092bba-dc7c-44bd-8dec-3496e64e0695",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Dash",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "ee3f3f5d-41a5-4ba6-8ab5-882577011345",
                     "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Pause",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "89dd6bc9-ffe5-45e1-a52a-6e24d11a99de",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "0ccab2b9-ddc6-4f91-b7c3-08a8936227f0",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -238,7 +194,7 @@
                 {
                     "name": "",
                     "id": "0fb9896d-9813-4e37-9afe-a605106dc850",
-                    "path": "<Gamepad>/leftTrigger",
+                    "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -254,6 +210,94 @@
                     "processors": "",
                     "groups": "",
                     "action": "SecondaryFire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "ScrollWheel",
+                    "id": "6aac8203-5e97-48fa-b6d1-80f3af43610e",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StrafeY",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "4404d474-5bce-4620-a562-f5d3675a760d",
+                    "path": "<Mouse>/scroll/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StrafeY",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "fd2e635d-710e-4a1f-a975-0a916ca33f64",
+                    "path": "<Mouse>/scroll/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StrafeY",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Gamepad",
+                    "id": "2e7d0086-1532-45b0-94a5-479fe4e5fed3",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StrafeY",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "58bb968f-1b55-4ade-aad2-83de515991cc",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StrafeY",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "5be26b74-23e8-442a-8146-2fcd554d581b",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "StrafeY",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "a01410f7-9dea-4258-8426-4d0f288836bd",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1e756213-b772-4fdb-8331-168b03714fa1",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dash",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
