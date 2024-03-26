@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class FirstPersonPlayer : MonoBehaviour
 {
     //For Terrain
+    [SerializeField] ChunkManager chunkManager;
     public Vector3 prevChunkLocation;
     public Vector3 chunkLocation;
 
@@ -30,6 +31,7 @@ public class FirstPersonPlayer : MonoBehaviour
 
     void Awake()
     {
+        chunkManager = GameObject.Find("ChunkManager").GetComponent<ChunkManager>();
         Cursor.lockState = CursorLockMode.Locked;
         controls = new Controls();
         actions = controls.Player;
@@ -46,17 +48,27 @@ public class FirstPersonPlayer : MonoBehaviour
         Movement();
     }
 
+
     private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
+        if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit, 300))
         {
-            if (hit.transform.gameObject.layer == 3)
+            if(hit.transform.GetComponent<Chunk>())
             {
-                Chunk chunk = hit.transform.GetComponent<Chunk>();
-                if (chunk)
-                {
-                    chunk.RemoveBlocks(hit.point);
-                }
+                Vector3 pointInTargetBlock = hit.point;
+                int chunkSize = chunkManager.voxelsPerChunk * chunkManager.voxelSize;
+
+                int chunkPosX = Mathf.FloorToInt(pointInTargetBlock.x / chunkManager.voxelsPerChunk) * chunkManager.voxelsPerChunk;
+                int chunkPosZ = Mathf.FloorToInt(pointInTargetBlock.z / chunkManager.voxelsPerChunk) * chunkManager.voxelsPerChunk;
+
+                Chunk chunk = ChunkManager.allChunks[new Vector3(chunkPosX, 0, chunkPosZ)];
+                
+                int x = Mathf.FloorToInt(pointInTargetBlock.x) - (chunkPosX+1);
+                int y = Mathf.FloorToInt(pointInTargetBlock.y);
+                int z = Mathf.FloorToInt(pointInTargetBlock.z) - (chunkPosZ+1);
+
+
+                chunk.RemoveBlock(x, y, z);
             }
         }
     }

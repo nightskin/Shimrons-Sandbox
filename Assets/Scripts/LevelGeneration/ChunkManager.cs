@@ -11,22 +11,20 @@ public class ChunkManager : MonoBehaviour
     public bool smoothing = false;
     public Gradient landGradient;
 
-    public int tilesPerChunkXZ = 32;
-    public int tilesPerChunkY = 32;
-    public float tileSize = 2;
+    public int voxelsPerChunk = 64;
+    public int voxelSize = 10;
 
     public static Noise noise;
     public static float chunkSize = 0;
     public float surfaceLevel = 16;
     public float noiseScale = 0.0025f;
 
-    [SerializeField] float maxViewDistance = 100;
+    [SerializeField] int maxChunkDistance = 10;
     [SerializeField] FirstPersonPlayer player;
     [SerializeField] GameObject chunkPrefab;
 
     CancellationTokenSource tokenSource;
 
-    int chunksXZ;
     public static Dictionary<Vector3,Chunk> allChunks = new Dictionary<Vector3, Chunk>();
 
     void Awake()
@@ -35,20 +33,18 @@ public class ChunkManager : MonoBehaviour
         if (seed == string.Empty) seed = System.DateTime.Now.ToString();
         noise = new Noise(seed.GetHashCode());
         if (!player) player = GameObject.FindGameObjectWithTag("Player").GetComponent<FirstPersonPlayer>();
-        maxViewDistance = Camera.main.farClipPlane;
-        chunkSize = (tilesPerChunkXZ - 4) * tileSize;
-        chunksXZ = Mathf.RoundToInt(maxViewDistance / chunkSize);
+        chunkSize = (voxelsPerChunk) * voxelSize;
     }
 
     void Start()
     {
         tokenSource = new CancellationTokenSource();
-        for (int x = -chunksXZ; x <= chunksXZ; x++)
+        for (int x = -maxChunkDistance; x <= maxChunkDistance; x++)
         {
-            for (int z = -chunksXZ; z <= chunksXZ; z++)
+            for (int z = -maxChunkDistance; z <= maxChunkDistance; z++)
             {
                 Vector3 position = player.chunkLocation + new Vector3(x * chunkSize, 0, z * chunkSize);
-                if(Vector3.Distance(position, player.chunkLocation) <= maxViewDistance)
+                if(Vector3.Distance(position, player.chunkLocation) <= maxChunkDistance)
                 {
                     CreateChunk(position);
                 }
@@ -60,12 +56,12 @@ public class ChunkManager : MonoBehaviour
     {
         if(player.prevChunkLocation != player.chunkLocation)
         {
-            for (int x = -chunksXZ; x <= chunksXZ; x++)
+            for (int x = -maxChunkDistance; x <= maxChunkDistance; x++)
             {
-                for (int z = -chunksXZ; z <= chunksXZ; z++)
+                for (int z = -maxChunkDistance; z <= maxChunkDistance; z++)
                 {
                     Vector3 position = player.chunkLocation + new Vector3(x * chunkSize, 0, z * chunkSize);
-                    if(Vector3.Distance(position, player.chunkLocation) <= maxViewDistance)
+                    if(Vector3.Distance(position, player.chunkLocation) <= maxChunkDistance)
                     {
                         LoadChunk(position);
                     }
@@ -73,23 +69,10 @@ public class ChunkManager : MonoBehaviour
             }
             foreach(Vector3 position in allChunks.Keys)
             {
-                if (Vector3.Distance(position, player.chunkLocation) > maxViewDistance)
+                if (Vector3.Distance(position, player.chunkLocation) > maxChunkDistance)
                 {
                     UnloadChunk(position);
                 }
-            }
-        }
-    }
-
-    void OnValidate()
-    {
-        if(Application.isPlaying)
-        {
-            foreach(Vector3 position in allChunks.Keys)
-            {
-                allChunks[position].CreateVoxelData(position);
-                allChunks[position].CreateMeshData();
-                allChunks[position].Draw();
             }
         }
     }
@@ -102,6 +85,9 @@ public class ChunkManager : MonoBehaviour
     void CreateChunk(Vector3 chunkPosition)
     {
         var chunk = Instantiate(chunkPrefab, chunkPosition, Quaternion.identity, transform).GetComponent<Chunk>();
+        chunk.gameObject.name = chunkPosition.ToString();
+        
+
         allChunks.Add(chunkPosition, chunk);
         chunk.CreateVoxelData(chunkPosition);
         chunk.CreateMeshData(getRidOfBlocksCuzTheySuck);
@@ -111,6 +97,9 @@ public class ChunkManager : MonoBehaviour
     async void CreateChunkAsync(Vector3 chunkPosition)
     {
         var chunk = Instantiate(chunkPrefab, chunkPosition, Quaternion.identity, transform).GetComponent<Chunk>();
+        chunk.gameObject.name = chunkPosition.ToString();
+
+
         allChunks.Add(chunkPosition, chunk);
         var result = await Task.Run(() =>
         {

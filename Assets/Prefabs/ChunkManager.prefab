@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   seed: 69
-  getRidOfBlocksCuzTheySuck: 1
+  getRidOfBlocksCuzTheySuck: 0
   smoothing: 0
   landGradient:
     serializedVersion: 2
@@ -76,11 +76,10 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
-  tilesPerChunkXZ: 32
-  tilesPerChunkY: 32
-  tileSize: 10
+  voxelsPerChunk: 64
+  voxelSize: 1
   surfaceLevel: 10
   noiseScale: 0.0025
-  maxViewDistance: 500
+  maxChunkDistance: 256
   player: {fileID: 0}
   chunkPrefab: {fileID: 891923478942689952, guid: cd783e17584ff174cab45bc11d5dbf70, type: 3}

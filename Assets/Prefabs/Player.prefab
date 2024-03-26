@@ -180,10 +180,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5bb9b341402e83418a5566f7e609cda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chunkManager: {fileID: 0}
   prevChunkLocation: {x: 0, y: 0, z: 0}
   chunkLocation: {x: 0, y: 0, z: 0}
   camera: {fileID: 6322392589356012951}
   controller: {fileID: 6322392591172081541}
   cameraBob: {fileID: 509730710}
-  speed: 50
+  speed: 15
   lookSpeed: 100
