@@ -26,18 +26,18 @@ public class Chunk : MonoBehaviour
 
     float Evaluate3D(Vector3 point)
     {
-        return Mathf.Abs(ChunkManager.noise.Evaluate(point * chunkManager.noiseScale));
+        return Mathf.Abs(ChunkManager.noise.Evaluate(point * ChunkManager.noiseScale));
     }
 
     float Evaluate2D(Vector3 point)
     {
         Vector3 p = new Vector3(point.x, 0, point.z);
-        return Mathf.Abs(ChunkManager.noise.Evaluate(p * chunkManager.noiseScale));
+        return Mathf.Abs(ChunkManager.noise.Evaluate(p * ChunkManager.noiseScale));
     }
 
     public void RemoveBlock(int x, int y, int z)
     {
-        if(x >= chunkManager.voxelsPerChunk || y >= chunkManager.voxelsPerChunk || z >= chunkManager.voxelsPerChunk || x < 0 || y < 0 || z < 0)
+        if(x >= ChunkManager.voxelsPerChunk || y >= ChunkManager.voxelsPerChunk || z >= ChunkManager.voxelsPerChunk || x < 0 || y < 0 || z < 0)
         {
             Debug.Log(x + "," + y + "," + z + " Out of Range");
             return;
@@ -55,6 +55,8 @@ public class Chunk : MonoBehaviour
             if (chunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
             else CreateVoxels();
             Draw();
+
+            Debug.Log(x + "," + y + "," + z + " Removed");
         }
         else
         {
@@ -75,28 +77,28 @@ public class Chunk : MonoBehaviour
 
     public void CreateVoxelData(Vector3 center)
     {
-        map = new Point[chunkManager.voxelsPerChunk, chunkManager.voxelsPerChunk, chunkManager.voxelsPerChunk];
-        for (int x = 0; x < chunkManager.voxelsPerChunk; x++)
+        map = new Point[ChunkManager.voxelsPerChunk, ChunkManager.voxelsPerChunk, ChunkManager.voxelsPerChunk];
+        for (int x = 0; x < ChunkManager.voxelsPerChunk; x++)
         {
-            for (int z = 0; z < chunkManager.voxelsPerChunk; z++)
+            for (int z = 0; z < ChunkManager.voxelsPerChunk; z++)
             {
-                for (int y = 0; y < chunkManager.voxelsPerChunk; y++)
+                for (int y = 0; y < ChunkManager.voxelsPerChunk; y++)
                 {
                     map[x, y, z] = new Point();
                     map[x, y, z].x = x;
                     map[x, y, z].y = y;
                     map[x, y, z].z = z;
 
-                    map[x, y, z].position = new Vector3(x, y, z) * (chunkManager.voxelSize);
-                    map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)chunkManager.voxelsPerChunk);
+                    map[x, y, z].position = new Vector3(x, y, z) * ChunkManager.voxelSize;
+                    map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)ChunkManager.voxelsPerChunk);
 
-                    if(y <= chunkManager.surfaceLevel)
+                    if(y <= ChunkManager.surfaceLevel)
                     {
-                        map[x,y,z].height = chunkManager.surfaceLevel;
+                        map[x,y,z].height = ChunkManager.surfaceLevel;
                     }
                     else
                     {
-                        map[x, y, z].height = Evaluate2D(map[x, y, z].position + center) * (chunkManager.voxelsPerChunk);
+                        map[x, y, z].height = Evaluate2D(map[x, y, z].position + center) * ChunkManager.voxelsPerChunk;
                     }
 
 
@@ -257,45 +259,45 @@ public class Chunk : MonoBehaviour
 
     public void CreateVoxels()
     {
-        for (int x = 0; x < chunkManager.voxelsPerChunk; x++)
+        for (int x = 0; x < ChunkManager.voxelsPerChunk; x++)
         {
-            for (int y = 0; y < chunkManager.voxelsPerChunk; y++)
+            for (int y = 0; y < ChunkManager.voxelsPerChunk; y++)
             {
-                for (int z = 0; z < chunkManager.voxelsPerChunk; z++)
+                for (int z = 0; z < ChunkManager.voxelsPerChunk; z++)
                 {
                     if (map[x, y, z].active)
                     {
-                        if (x < chunkManager.voxelsPerChunk - 1)
+                        if (x < ChunkManager.voxelsPerChunk - 1)
                         {
-                            if (!map[x + 1, y, z].active) CreateQuadRight(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
+                            if (!map[x + 1, y, z].active) CreateQuadRight(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
                         }
                         if (x > 0)
                         {
-                            if (!map[x - 1, y, z].active) CreateQuadLeft(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
+                            if (!map[x - 1, y, z].active) CreateQuadLeft(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
                         }
-                        if (y < chunkManager.voxelsPerChunk - 1)
+                        if (y < ChunkManager.voxelsPerChunk - 1)
                         {
-                            if (!map[x, y + 1, z].active) CreateQuadTop(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
+                            if (!map[x, y + 1, z].active) CreateQuadTop(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
                         }
                         if (y > 0)
                         {
-                            if (!map[x, y - 1, z].active) CreateQuadBottom(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
+                            if (!map[x, y - 1, z].active) CreateQuadBottom(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
                         }
-                        if (z < chunkManager.voxelsPerChunk - 1)
+                        if (z < ChunkManager.voxelsPerChunk - 1)
                         {
-                            if (!map[x, y, z + 1].active) CreateQuadFront(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
+                            if (!map[x, y, z + 1].active) CreateQuadFront(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
                         }
                         if (z > 0)
                         {
-                            if (!map[x, y, z - 1].active) CreateQuadBack(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
+                            if (!map[x, y, z - 1].active) CreateQuadBack(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
                         }
 
-                        if (x == 0) CreateQuadLeft(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
-                        if (y == 0) CreateQuadBottom(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
-                        if (z == 0) CreateQuadBack(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
-                        if (x == chunkManager.voxelsPerChunk - 1) CreateQuadRight(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
-                        if (y == chunkManager.voxelsPerChunk - 1) CreateQuadTop(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
-                        if (z == chunkManager.voxelsPerChunk - 1) CreateQuadFront(map[x, y, z].position, chunkManager.voxelSize, map[x, y, z].color);
+                        if (x == 0) CreateQuadLeft(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
+                        if (y == 0) CreateQuadBottom(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
+                        if (z == 0) CreateQuadBack(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
+                        if (x == ChunkManager.voxelsPerChunk - 1) CreateQuadRight(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
+                        if (y == ChunkManager.voxelsPerChunk - 1) CreateQuadTop(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
+                        if (z == ChunkManager.voxelsPerChunk - 1) CreateQuadFront(map[x, y, z].position, ChunkManager.voxelSize, map[x, y, z].color);
 
                     }
                 }
@@ -306,13 +308,13 @@ public class Chunk : MonoBehaviour
     public void MarchingCubes()
     {
 
-        for (int x = chunkManager.voxelsPerChunk; x > 0; x--)
+        for (int x = ChunkManager.voxelsPerChunk; x > 0; x--)
         {
-            for (int y = chunkManager.voxelsPerChunk; y > 0; y--)
+            for (int y = ChunkManager.voxelsPerChunk; y > 0; y--)
             {
-                for (int z = chunkManager.voxelsPerChunk; z > 0; z--)
+                for (int z = ChunkManager.voxelsPerChunk; z > 0; z--)
                 {
-                    if (x < chunkManager.voxelsPerChunk - 1 && y < chunkManager.voxelsPerChunk - 1 && z < chunkManager.voxelsPerChunk - 1)
+                    if (x < ChunkManager.voxelsPerChunk - 1 && y < ChunkManager.voxelsPerChunk - 1 && z < ChunkManager.voxelsPerChunk - 1)
                     {
                         Point[] points = new Point[]
                         {

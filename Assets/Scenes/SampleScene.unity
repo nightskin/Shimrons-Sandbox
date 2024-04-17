@@ -469,6 +469,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 6322392590281455844}
+    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
+      propertyPath: smoothing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
+      propertyPath: getRidOfBlocksCuzTheySuck
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1907376978244307221, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -536,15 +548,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 65
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_LocalRotation.w
@@ -576,3 +588,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
+--- !u!114 &6322392590281455844 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6322392591172081540, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
+  m_PrefabInstance: {fileID: 6322392590281455843}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5bb9b341402e83418a5566f7e609cda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

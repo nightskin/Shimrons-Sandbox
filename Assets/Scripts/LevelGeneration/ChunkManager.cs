@@ -3,6 +3,7 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class ChunkManager : MonoBehaviour
 {
@@ -11,13 +12,13 @@ public class ChunkManager : MonoBehaviour
     public bool smoothing = false;
     public Gradient landGradient;
 
-    public int voxelsPerChunk = 64;
-    public int voxelSize = 10;
+    public static int voxelsPerChunk = 64;
+    public static float voxelSize = 1;
 
     public static Noise noise;
     public static float chunkSize = 0;
-    public float surfaceLevel = 16;
-    public float noiseScale = 0.0025f;
+    public static float surfaceLevel = 16;
+    public static float noiseScale = 0.0025f;
 
     [SerializeField] int maxChunkDistance = 10;
     [SerializeField] FirstPersonPlayer player;
@@ -29,11 +30,10 @@ public class ChunkManager : MonoBehaviour
 
     void Awake()
     {
-
         if (seed == string.Empty) seed = System.DateTime.Now.ToString();
         noise = new Noise(seed.GetHashCode());
         if (!player) player = GameObject.FindGameObjectWithTag("Player").GetComponent<FirstPersonPlayer>();
-        chunkSize = (voxelsPerChunk) * voxelSize;
+        chunkSize = voxelsPerChunk * voxelSize;
     }
 
     void Start()
@@ -80,6 +80,25 @@ public class ChunkManager : MonoBehaviour
     void OnDisable()
     {
         tokenSource.Cancel();
+    }
+
+    public static Vector3Int PositionToIndex(Vector3 pos)
+    {
+        float x = pos.x / voxelSize / voxelsPerChunk;
+        float y = pos.y / voxelSize / voxelsPerChunk;
+        float z = pos.z / voxelSize / voxelsPerChunk;
+
+        x = Mathf.Abs(ConvertRange(0, 1, 0, voxelsPerChunk, x));
+        y = Mathf.Abs(ConvertRange(0, 1, 0, voxelsPerChunk, y));
+        z = Mathf.Abs(ConvertRange(0, 1, 0, voxelsPerChunk, z));
+
+        return new Vector3Int(Mathf.RoundToInt(x), Mathf.RoundToInt(y), Mathf.RoundToInt(z));
+    }
+    
+    public static float ConvertRange(float originalStart, float originalEnd, float newStart, float newEnd, float value)
+    {
+        float scale = (newEnd - newStart) / (originalEnd - originalStart);
+        return (newStart + ((value - originalStart) * scale));
     }
 
     void CreateChunk(Vector3 chunkPosition)

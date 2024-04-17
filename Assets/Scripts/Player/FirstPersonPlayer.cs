@@ -48,27 +48,16 @@ public class FirstPersonPlayer : MonoBehaviour
         Movement();
     }
 
-
     private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit, 300))
+        if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
         {
             if(hit.transform.GetComponent<Chunk>())
             {
-                Vector3 pointInTargetBlock = hit.point;
-                int chunkSize = chunkManager.voxelsPerChunk * chunkManager.voxelSize;
-
-                int chunkPosX = Mathf.FloorToInt(pointInTargetBlock.x / chunkManager.voxelsPerChunk) * chunkManager.voxelsPerChunk;
-                int chunkPosZ = Mathf.FloorToInt(pointInTargetBlock.z / chunkManager.voxelsPerChunk) * chunkManager.voxelsPerChunk;
-
-                Chunk chunk = ChunkManager.allChunks[new Vector3(chunkPosX, 0, chunkPosZ)];
-                
-                int x = Mathf.FloorToInt(pointInTargetBlock.x) - (chunkPosX+1);
-                int y = Mathf.FloorToInt(pointInTargetBlock.y);
-                int z = Mathf.FloorToInt(pointInTargetBlock.z) - (chunkPosZ+1);
-
-
-                chunk.RemoveBlock(x, y, z);
+                Chunk chunk = hit.transform.GetComponent<Chunk>();
+                Vector3 pointInTargetBlock = hit.point + (camera.transform.forward * 0.1f) - chunk.transform.position;
+                Vector3Int index = ChunkManager.PositionToIndex(pointInTargetBlock);
+                chunk.RemoveBlock(index.x, index.y, index.z);
             }
         }
     }
