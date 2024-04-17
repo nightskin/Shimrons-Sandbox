@@ -35,6 +35,34 @@ public class Chunk : MonoBehaviour
         return Mathf.Abs(ChunkManager.noise.Evaluate(p * ChunkManager.noiseScale));
     }
 
+    public void RemoveBlock(Vector3 point)
+    {
+        Point closestPoint = new Point();
+        for(int x = 0; x < ChunkManager.voxelsPerChunk; x++)
+        {
+            for (int z = 0; z < ChunkManager.voxelsPerChunk; z++)
+            {
+                for (int y = 0; y < ChunkManager.voxelsPerChunk; y++)
+                {
+                    if(Vector3.Distance(closestPoint.position, point) > Vector3.Distance(map[x,y,z].position, point))
+                    {
+                        closestPoint = map[x, y, z];
+                    }
+                }
+            }
+        }
+
+        map[closestPoint.x, closestPoint.y, closestPoint.z].active = false;
+        verts.Clear();
+        tris.Clear();
+        colors.Clear();
+        buffer = 0;
+
+        if (chunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
+        else CreateVoxels();
+        Draw();
+    }
+
     public void RemoveBlock(int x, int y, int z)
     {
         if(x >= ChunkManager.voxelsPerChunk || y >= ChunkManager.voxelsPerChunk || z >= ChunkManager.voxelsPerChunk || x < 0 || y < 0 || z < 0)
@@ -77,12 +105,12 @@ public class Chunk : MonoBehaviour
 
     public void CreateVoxelData(Vector3 center)
     {
-        map = new Point[ChunkManager.voxelsPerChunk, ChunkManager.voxelsPerChunk, ChunkManager.voxelsPerChunk];
-        for (int x = 0; x < ChunkManager.voxelsPerChunk; x++)
+        map = new Point[ChunkManager.voxelsPerChunk + 1, ChunkManager.voxelsPerChunk + 1, ChunkManager.voxelsPerChunk + 1];
+        for (int x = 0; x < ChunkManager.voxelsPerChunk + 1; x++)
         {
-            for (int z = 0; z < ChunkManager.voxelsPerChunk; z++)
+            for (int z = 0; z < ChunkManager.voxelsPerChunk + 1; z++)
             {
-                for (int y = 0; y < ChunkManager.voxelsPerChunk; y++)
+                for (int y = 0; y < ChunkManager.voxelsPerChunk + 1; y++)
                 {
                     map[x, y, z] = new Point();
                     map[x, y, z].x = x;
@@ -92,7 +120,7 @@ public class Chunk : MonoBehaviour
                     map[x, y, z].position = new Vector3(x, y, z) * ChunkManager.voxelSize;
                     map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)ChunkManager.voxelsPerChunk);
 
-                    if(y <= ChunkManager.surfaceLevel)
+                    if(y < ChunkManager.surfaceLevel)
                     {
                         map[x,y,z].height = ChunkManager.surfaceLevel;
                     }
@@ -100,6 +128,7 @@ public class Chunk : MonoBehaviour
                     {
                         map[x, y, z].height = Evaluate2D(map[x, y, z].position + center) * ChunkManager.voxelsPerChunk;
                     }
+
 
 
                     if (map[x,y,z].height >= y)
@@ -307,17 +336,14 @@ public class Chunk : MonoBehaviour
 
     public void MarchingCubes()
     {
-
         for (int x = ChunkManager.voxelsPerChunk; x > 0; x--)
         {
             for (int y = ChunkManager.voxelsPerChunk; y > 0; y--)
             {
                 for (int z = ChunkManager.voxelsPerChunk; z > 0; z--)
                 {
-                    if (x < ChunkManager.voxelsPerChunk - 1 && y < ChunkManager.voxelsPerChunk - 1 && z < ChunkManager.voxelsPerChunk - 1)
-                    {
-                        Point[] points = new Point[]
-                        {
+                    Point[] points = new Point[]
+                    {   
                             map[x,y,z-1],
                             map[x-1,y,z-1],
                             map[x-1,y,z],
@@ -326,38 +352,37 @@ public class Chunk : MonoBehaviour
                             map[x-1,y-1,z-1],
                             map[x-1,y-1,z],
                             map[x,y-1,z],
-                        };
-                        int cubeIndex = GetState(points);
-                        int[] triangulation = MarchingCubesTables.triTable[cubeIndex];
-                        foreach (int edgeIndex in triangulation)
+                    };
+                    int cubeIndex = GetState(points);
+                    int[] triangulation = MarchingCubesTables.triTable[cubeIndex];
+                    foreach (int edgeIndex in triangulation)
+                    {
+                        if (edgeIndex > -1)
                         {
-                            if (edgeIndex > -1)
+                            int a = MarchingCubesTables.edgeConnections[edgeIndex][0];
+                            int b = MarchingCubesTables.edgeConnections[edgeIndex][1];
+
+                            Vector3 vertexPos;
+                            if (chunkManager.smoothing)
                             {
-                                int a = MarchingCubesTables.edgeConnections[edgeIndex][0];
-                                int b = MarchingCubesTables.edgeConnections[edgeIndex][1];
-
-                                Vector3 vertexPos;
-                                if(chunkManager.smoothing)
-                                {
-                                    float level = Mathf.Max(points[a].y, points[b].y);
-                                    float amount = (level - points[a].height) / (points[b].height - points[a].height);
-                                    vertexPos = Vector3.Lerp(points[a].position, points[b].position, amount);
-                                }
-                                else
-                                {
-                                    vertexPos = (points[a].position + points[b].position) / 2;
-                                }
-
-
-                                verts.Add(vertexPos);
-                                tris.Add(buffer);
-                                colors.Add(GetMidPointColor(points[a], points[b]));
-                                buffer++;
+                                float level = Mathf.Max(points[a].y, points[b].y);
+                                float amount = (level - points[a].height) / (points[b].height - points[a].height);
+                                vertexPos = Vector3.Lerp(points[a].position, points[b].position, amount);
                             }
                             else
                             {
-                                break;
+                                vertexPos = (points[a].position + points[b].position) / 2;
                             }
+
+
+                            verts.Add(vertexPos);
+                            tris.Add(buffer);
+                            colors.Add(GetMidPointColor(points[a], points[b]));
+                            buffer++;
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
                 }

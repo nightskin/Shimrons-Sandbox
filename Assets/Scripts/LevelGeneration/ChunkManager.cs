@@ -11,9 +11,10 @@ public class ChunkManager : MonoBehaviour
     public bool getRidOfBlocksCuzTheySuck = true;
     public bool smoothing = false;
     public Gradient landGradient;
+    public Color UndergroundColor = Color.yellow;
 
     public static int voxelsPerChunk = 64;
-    public static float voxelSize = 1;
+    public static float voxelSize = 2;
 
     public static Noise noise;
     public static float chunkSize = 0;

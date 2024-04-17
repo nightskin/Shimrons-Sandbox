@@ -478,6 +478,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
+      propertyPath: UndergroundColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
+      propertyPath: UndergroundColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
+      propertyPath: UndergroundColor.g
+      value: 0.20581311
+      objectReference: {fileID: 0}
+    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
+      propertyPath: UndergroundColor.r
+      value: 0.509434
+      objectReference: {fileID: 0}
+    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
       propertyPath: getRidOfBlocksCuzTheySuck
       value: 0
       objectReference: {fileID: 0}

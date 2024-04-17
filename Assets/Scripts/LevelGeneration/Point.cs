@@ -8,9 +8,9 @@ public class Point
     public bool active = false;
     public float height = 0;
     public Vector3 position = new Vector3();
-    public int x;
-    public int y;
-    public int z;
+    public int x = 0;
+    public int y = 0;
+    public int z = 0;
 
     public Point()
     {
