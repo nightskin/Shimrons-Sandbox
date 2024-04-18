@@ -217,7 +217,7 @@ RectTransform:
   m_Children:
   - {fileID: 1208637375}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -384,7 +384,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1208637374
 GameObject:
@@ -462,44 +462,16 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1208637374}
   m_CullTransparentMesh: 1
---- !u!1001 &1788248845
+--- !u!1001 &1448426238
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
-      propertyPath: player
-      value: 
-      objectReference: {fileID: 6322392590281455844}
-    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
-      propertyPath: smoothing
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
-      propertyPath: UndergroundColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
-      propertyPath: UndergroundColor.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
-      propertyPath: UndergroundColor.g
-      value: 0.20581311
-      objectReference: {fileID: 0}
-    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
-      propertyPath: UndergroundColor.r
-      value: 0.509434
-      objectReference: {fileID: 0}
-    - target: {fileID: 1907376978244307220, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
-      propertyPath: getRidOfBlocksCuzTheySuck
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1907376978244307221, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1907376978244307221, guid: a632e08518c62f641bcce7ee861ff5cd, type: 3}
       propertyPath: m_LocalPosition.x
@@ -604,14 +576,3 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
---- !u!114 &6322392590281455844 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6322392591172081540, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
-  m_PrefabInstance: {fileID: 6322392590281455843}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5bb9b341402e83418a5566f7e609cda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

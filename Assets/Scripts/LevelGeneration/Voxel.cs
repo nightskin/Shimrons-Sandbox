@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Point
+public class Voxel
 {
     public Color color = new Color();
     public bool active = false;
@@ -12,7 +12,7 @@ public class Point
     public int y = 0;
     public int z = 0;
 
-    public Point()
+    public Voxel()
     {
 
     }

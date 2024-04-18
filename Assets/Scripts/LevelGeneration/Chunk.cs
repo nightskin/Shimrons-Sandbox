@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
-    public Point[,,] map = null;
+    public Voxel[,,] map = null;
     public Mesh mesh;
     ChunkManager chunkManager;
 
@@ -18,10 +18,20 @@ public class Chunk : MonoBehaviour
 
     void Awake()
     {
-        chunkManager = GameObject.Find("ChunkManager").GetComponent<ChunkManager>();
+        GameObject chunkManagerObj = GameObject.Find("ChunkManager");
+        if (chunkManagerObj) chunkManager = chunkManagerObj.GetComponent<ChunkManager>();
+
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
+
+        if(!chunkManager)
+        {
+            CreateVoxelData(transform.position);
+            CreateMeshData(ChunkManager.getRidOfBlocksCuzTheySuck);
+            Draw();
+        }
+
     }
 
     float Evaluate3D(Vector3 point)
@@ -37,7 +47,7 @@ public class Chunk : MonoBehaviour
 
     public void RemoveBlock(Vector3 point)
     {
-        Point closestPoint = new Point();
+        Voxel closestPoint = new Voxel();
         for(int x = 0; x < ChunkManager.voxelsPerChunk; x++)
         {
             for (int z = 0; z < ChunkManager.voxelsPerChunk; z++)
@@ -58,7 +68,7 @@ public class Chunk : MonoBehaviour
         colors.Clear();
         buffer = 0;
 
-        if (chunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
+        if (ChunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
         else CreateVoxels();
         Draw();
     }
@@ -80,7 +90,7 @@ public class Chunk : MonoBehaviour
             colors.Clear();
             buffer = 0;
 
-            if (chunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
+            if (ChunkManager.getRidOfBlocksCuzTheySuck) MarchingCubes();
             else CreateVoxels();
             Draw();
 
@@ -105,20 +115,20 @@ public class Chunk : MonoBehaviour
 
     public void CreateVoxelData(Vector3 center)
     {
-        map = new Point[ChunkManager.voxelsPerChunk + 1, ChunkManager.voxelsPerChunk + 1, ChunkManager.voxelsPerChunk + 1];
+        map = new Voxel[ChunkManager.voxelsPerChunk + 1, ChunkManager.voxelsPerChunk + 1, ChunkManager.voxelsPerChunk + 1];
         for (int x = 0; x < ChunkManager.voxelsPerChunk + 1; x++)
         {
             for (int z = 0; z < ChunkManager.voxelsPerChunk + 1; z++)
             {
                 for (int y = 0; y < ChunkManager.voxelsPerChunk + 1; y++)
                 {
-                    map[x, y, z] = new Point();
+                    map[x, y, z] = new Voxel();
                     map[x, y, z].x = x;
                     map[x, y, z].y = y;
                     map[x, y, z].z = z;
 
                     map[x, y, z].position = new Vector3(x, y, z) * ChunkManager.voxelSize;
-                    map[x, y, z].color = chunkManager.landGradient.Evaluate((float)y / (float)ChunkManager.voxelsPerChunk);
+                    map[x, y, z].color = new Color(0, 0.5f, 0);
 
                     if(y < ChunkManager.surfaceLevel)
                     {
@@ -342,7 +352,7 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = ChunkManager.voxelsPerChunk; z > 0; z--)
                 {
-                    Point[] points = new Point[]
+                    Voxel[] points = new Voxel[]
                     {   
                             map[x,y,z-1],
                             map[x-1,y,z-1],
@@ -363,7 +373,7 @@ public class Chunk : MonoBehaviour
                             int b = MarchingCubesTables.edgeConnections[edgeIndex][1];
 
                             Vector3 vertexPos;
-                            if (chunkManager.smoothing)
+                            if (ChunkManager.smoothing)
                             {
                                 float level = Mathf.Max(points[a].y, points[b].y);
                                 float amount = (level - points[a].height) / (points[b].height - points[a].height);
@@ -390,7 +400,7 @@ public class Chunk : MonoBehaviour
         }
     }
 
-    int GetState(Point[] points)
+    int GetState(Voxel[] points)
     {
         int state = 0;
         if (points[0].active) state |= 1;
@@ -404,7 +414,7 @@ public class Chunk : MonoBehaviour
         return state;
     }
 
-    Color GetMidPointColor(Point point1, Point point2)
+    Color GetMidPointColor(Voxel point1, Voxel point2)
     {
         return (point1.color + point2.color) / 2;
     }

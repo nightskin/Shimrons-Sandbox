@@ -31,7 +31,9 @@ public class FirstPersonPlayer : MonoBehaviour
 
     void Awake()
     {
-        chunkManager = GameObject.Find("ChunkManager").GetComponent<ChunkManager>();
+        GameObject chunkManagerObj = GameObject.Find("ChunkManager");
+        if (chunkManagerObj) chunkManager = chunkManagerObj.GetComponent<ChunkManager>();
+
         Cursor.lockState = CursorLockMode.Locked;
         controls = new Controls();
         actions = controls.Player;

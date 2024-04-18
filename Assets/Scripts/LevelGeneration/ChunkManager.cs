@@ -8,15 +8,13 @@ using static UnityEditor.PlayerSettings;
 public class ChunkManager : MonoBehaviour
 {
     public string seed = "";
-    public bool getRidOfBlocksCuzTheySuck = true;
-    public bool smoothing = false;
-    public Gradient landGradient;
-    public Color UndergroundColor = Color.yellow;
+    public static bool getRidOfBlocksCuzTheySuck = true;
+    public static bool smoothing = false;
 
     public static int voxelsPerChunk = 64;
     public static float voxelSize = 2;
 
-    public static Noise noise;
+    public static Noise noise = new Noise();
     public static float chunkSize = 0;
     public static float surfaceLevel = 16;
     public static float noiseScale = 0.0025f;
