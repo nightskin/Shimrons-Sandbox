@@ -4,7 +4,6 @@ using UnityEngine.UI;
 public class FirstPersonPlayer : MonoBehaviour
 {
     //For Terrain
-    [SerializeField] ChunkManager chunkManager;
     public Vector3 prevChunkLocation;
     public Vector3 chunkLocation;
 
@@ -31,9 +30,6 @@ public class FirstPersonPlayer : MonoBehaviour
 
     void Awake()
     {
-        GameObject chunkManagerObj = GameObject.Find("ChunkManager");
-        if (chunkManagerObj) chunkManager = chunkManagerObj.GetComponent<ChunkManager>();
-
         Cursor.lockState = CursorLockMode.Locked;
         controls = new Controls();
         actions = controls.Player;
@@ -54,12 +50,11 @@ public class FirstPersonPlayer : MonoBehaviour
     {
         if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
         {
-            if(hit.transform.GetComponent<Chunk>())
+            if (hit.transform.GetComponent<Chunk>())
             {
                 Chunk chunk = hit.transform.GetComponent<Chunk>();
-                Vector3 pointInTargetBlock = hit.point + (camera.transform.forward * 0.1f) - chunk.transform.position;
-                Vector3Int index = ChunkManager.PositionToIndex(pointInTargetBlock);
-                chunk.RemoveBlock(index.x, index.y, index.z);
+                Vector3 pointInTargetBlock = hit.transform.InverseTransformPoint(hit.point + (camera.transform.forward * 0.1f));
+                chunk.RemoveBlock(pointInTargetBlock);
             }
         }
     }
@@ -90,11 +85,11 @@ public class FirstPersonPlayer : MonoBehaviour
         if (actions.Move.ReadValue<Vector2>().magnitude > 0)
         {
 
-            prevChunkLocation = chunkLocation;
+            //prevChunkLocation = chunkLocation;
             //Calculate ChunkPos
-            float chunkPosX = Mathf.Round(transform.position.x / ChunkManager.chunkSize) * ChunkManager.chunkSize;
-            float chunkPosZ = Mathf.Round(transform.position.z / ChunkManager.chunkSize) * ChunkManager.chunkSize;
-            chunkLocation = new Vector3(chunkPosX, 0, chunkPosZ);
+            //float chunkPosX = Mathf.Round(transform.position.x / ChunkManager.chunkSize) * ChunkManager.chunkSize;
+            //float chunkPosZ = Mathf.Round(transform.position.z / ChunkManager.chunkSize) * ChunkManager.chunkSize;
+            //chunkLocation = new Vector3(chunkPosX, 0, chunkPosZ);
         }
 
 
@@ -117,5 +112,5 @@ public class FirstPersonPlayer : MonoBehaviour
 
     }
 
-    
+
 }
