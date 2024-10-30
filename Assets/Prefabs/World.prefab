@@ -44,5 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad27dfc9322697145bafabd5d9ecd867, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seed: 
+  voxelsInSingleChunk: 128
+  voxelSize: 1
   player: {fileID: 0}
   chunkPrefab: {fileID: 891923478942689952, guid: cd783e17584ff174cab45bc11d5dbf70, type: 3}

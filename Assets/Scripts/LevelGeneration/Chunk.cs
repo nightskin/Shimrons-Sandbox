@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -28,7 +24,8 @@ public class Chunk : MonoBehaviour
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
-        Create();
+        CreateVoxelData(transform.position);
+        CreateVoxels();
         loaded = true;
     }
 
@@ -41,19 +38,20 @@ public class Chunk : MonoBehaviour
             colors.Clear();
             indexBuffer = 0;
 
-            Create();
+            CreateVoxelData(transform.position);
+            CreateVoxels();
         }
     }
 
     public void RemoveBlock(Vector3 point)
     {
-        Vector3Int i3d = PositionToIndex3D(point);
-        if (i3d.x >= World.voxelsInSingleChunk || i3d.y >= World.voxelsInSingleChunk || i3d.z >= World.voxelsInSingleChunk || i3d.x < 0 || i3d.y < 0 || i3d.z < 0)
+        Vector3Int i3d = world.PositionToIndex3D(point);
+        if (i3d.x >= world.voxelsInSingleChunk || i3d.y >= world.voxelsInSingleChunk || i3d.z >= world.voxelsInSingleChunk || i3d.x < 0 || i3d.y < 0 || i3d.z < 0)
         {
             Debug.Log(i3d.x + "," + i3d.y + "," + i3d.z + " Out of Range");
             return;
         }
-        int i = Index3DToIndex(i3d);
+        int i = world.Index3DToIndex(i3d);
         if (data[i].active)
         {
             data[i].active = false;
@@ -211,41 +209,21 @@ public class Chunk : MonoBehaviour
 
     }
 
-    float Evaluate2D(Vector3 point)
-    {
-        point = new Vector3(point.x, 0, point.z) * World.noiseScale;
-        float noiseValue = 0;
-        float frequency = World.baseRoughness;
-        float amplitude = 1;
-
-
-        for(int i = 0; i < World.layers; i++)
-        {
-            float v = World.noise.Evaluate(point * frequency);
-            noiseValue += (v + 1) * 0.5f * amplitude;
-            frequency *= World.roughness;
-            amplitude *= World.persistance;
-        }
-
-        noiseValue = Mathf.Max(World.minValue, noiseValue - World.minValue);
-        return noiseValue * World.strength;
-    }
-
     void CreateVoxelData(Vector3 center)
     {
-        data = new Voxel[World.voxelsInSingleChunk * World.voxelsInSingleChunk * World.voxelsInSingleChunk];
-        for (int i = 0; i < (World.voxelsInSingleChunk * World.voxelsInSingleChunk * World.voxelsInSingleChunk); i++)
+        data = new Voxel[world.voxelsInSingleChunk * world.voxelsInSingleChunk * world.voxelsInSingleChunk];
+        for (int i = 0; i < (world.voxelsInSingleChunk * world.voxelsInSingleChunk * world.voxelsInSingleChunk); i++)
         {
-            Vector3Int index3d = IndexToIndex3D(i);
+            Vector3Int index3d = world.IndexToIndex3D(i);
 
             data[i] = new Voxel();
             data[i].color = Color.white;
             data[i].x = index3d.x;
             data[i].y = index3d.y;
             data[i].z = index3d.z;
-            data[i].position = new Vector3(index3d.x, index3d.y, index3d.z) * World.voxelSize;
+            data[i].position = new Vector3(index3d.x, index3d.y, index3d.z) * world.voxelSize;
 
-            float height = Evaluate2D(data[i].position + center) * World.voxelsInSingleChunk;
+            float height = World.Evaluate2D(data[i].position + center) * world.voxelsInSingleChunk;
 
 
             if (height < data[i].position.y)
@@ -261,70 +239,70 @@ public class Chunk : MonoBehaviour
 
     void CreateVoxels()
     {
-        for (int i = 0; i < (World.voxelsInSingleChunk * World.voxelsInSingleChunk * World.voxelsInSingleChunk); i++)
+        for (int i = 0; i < (world.voxelsInSingleChunk * world.voxelsInSingleChunk * world.voxelsInSingleChunk); i++)
         {
-            Vector3Int pos = IndexToIndex3D(i);
+            Vector3Int pos = world.IndexToIndex3D(i);
             if (data[i].active)
             {
-                if (pos.x < World.voxelsInSingleChunk - 1)
+                if (pos.x < world.voxelsInSingleChunk - 1)
                 {
-                    int index = Index3DToIndex(new Vector3Int(pos.x + 1, pos.y, pos.z));
-                    if (!data[index].active) CreateQuadRight(data[i].position, World.voxelSize, data[i].color);
+                    int index = world.Index3DToIndex(new Vector3Int(pos.x + 1, pos.y, pos.z));
+                    if (!data[index].active) CreateQuadRight(data[i].position, world.voxelSize, data[i].color);
                 }
                 if (pos.x > 0)
                 {
-                    int index = Index3DToIndex(new Vector3Int(pos.x - 1, pos.y, pos.z));
-                    if (!data[index].active) CreateQuadLeft(data[i].position, World.voxelSize, data[i].color);
+                    int index = world.Index3DToIndex(new Vector3Int(pos.x - 1, pos.y, pos.z));
+                    if (!data[index].active) CreateQuadLeft(data[i].position, world.voxelSize, data[i].color);
                 }
 
-                if (pos.z < World.voxelsInSingleChunk - 1)
+                if (pos.z < world.voxelsInSingleChunk - 1)
                 {
-                    int index = Index3DToIndex(new Vector3Int(pos.x, pos.y, pos.z + 1));
-                    if (!data[index].active) CreateQuadFront(data[i].position, World.voxelSize, data[i].color);
+                    int index = world.Index3DToIndex(new Vector3Int(pos.x, pos.y, pos.z + 1));
+                    if (!data[index].active) CreateQuadFront(data[i].position, world.voxelSize, data[i].color);
                 }
                 if (pos.z > 0)
                 {
-                    int index = Index3DToIndex(new Vector3Int(pos.x, pos.y, pos.z - 1));
-                    if (!data[index].active) CreateQuadBack(data[i].position, World.voxelSize, data[i].color);
+                    int index = world.Index3DToIndex(new Vector3Int(pos.x, pos.y, pos.z - 1));
+                    if (!data[index].active) CreateQuadBack(data[i].position, world.voxelSize, data[i].color);
                 }
 
-                if (pos.y < World.voxelsInSingleChunk - 1)
+                if (pos.y < world.voxelsInSingleChunk - 1)
                 {
-                    int index = Index3DToIndex(new Vector3Int(pos.x, pos.y + 1, pos.z));
-                    if (!data[index].active) CreateQuadTop(data[i].position, World.voxelSize, data[i].color);
+                    int index = world.Index3DToIndex(new Vector3Int(pos.x, pos.y + 1, pos.z));
+                    if (!data[index].active) CreateQuadTop(data[i].position, world.voxelSize, data[i].color);
                 }
                 if (pos.y > 0)
                 {
-                    int index = Index3DToIndex(new Vector3Int(pos.x, pos.y - 1, pos.z));
-                    if (!data[index].active) CreateQuadBottom(data[i].position, World.voxelSize, data[i].color);
+                    int index = world.Index3DToIndex(new Vector3Int(pos.x, pos.y - 1, pos.z));
+                    if (!data[index].active) CreateQuadBottom(data[i].position, world.voxelSize, data[i].color);
                 }
 
 
                 if (pos.x == 0)
                 {
-                    CreateQuadLeft(data[i].position, World.voxelSize, data[i].color);
+                    CreateQuadLeft(data[i].position, world.voxelSize, data[i].color);
                 }
-                if (pos.x == World.voxelsInSingleChunk - 1)
+                if (pos.x == world.voxelsInSingleChunk - 1)
                 {
-                    CreateQuadRight(data[i].position, World.voxelSize, data[i].color);
+                    CreateQuadRight(data[i].position, world.voxelSize, data[i].color);
                 }
 
                 if (pos.z == 0)
                 {
-                    CreateQuadBack(data[i].position, World.voxelSize, data[i].color);
+                    CreateQuadBack(data[i].position,   world.voxelSize, data[i].color);
                 }
-                if (pos.z == World.voxelsInSingleChunk - 1)
+                if (pos.z == world.voxelsInSingleChunk - 1)
                 {
-                    CreateQuadFront(data[i].position, World.voxelSize, data[i].color);
+                    CreateQuadFront(data[i].position, world.voxelSize, data[i].color);
                 }
 
                 if (pos.y == 0)
                 {
-                    CreateQuadBottom(data[i].position, World.voxelSize, data[i].color);
+                    CreateQuadBottom(data[i].position, world.voxelSize, data[i].color);
                 }
-                if (pos.y == World.voxelsInSingleChunk - 1)
+                if (pos.y == world.voxelsInSingleChunk - 1)
                 {
-                    CreateQuadTop(data[i].position, World.voxelSize, data[i].color);
+                    CreateQuadTop(data[i].position, world.voxelSize, data[i].color);
                 }
             }
         }
@@ -338,42 +316,7 @@ public class Chunk : MonoBehaviour
         GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
-    public void Create()
-    {
-        CreateVoxelData(transform.position);
-        CreateVoxels();
-    }
 
-    Vector3Int IndexToIndex3D(int index)
-    {
-        int x = index % World.voxelsInSingleChunk;
-        int z = (index / World.voxelsInSingleChunk) % World.voxelsInSingleChunk;
-        int y = ((index / World.voxelsInSingleChunk) / World.voxelsInSingleChunk) % World.voxelsInSingleChunk;
 
-        return new Vector3Int(x, y, z);
-    }
 
-    int Index3DToIndex(Vector3Int pos)
-    {
-        return pos.x + (pos.z * World.voxelsInSingleChunk) + (pos.y * (World.voxelsInSingleChunk * World.voxelsInSingleChunk));
-    }
-
-    public Vector3Int PositionToIndex3D(Vector3 pos)
-    {
-        float x = pos.x / World.voxelSize / World.voxelsInSingleChunk;
-        float y = pos.y / World.voxelSize / World.voxelsInSingleChunk;
-        float z = pos.z / World.voxelSize / World.voxelsInSingleChunk;
-
-        x = Mathf.Abs(ConvertRange(0, 1, 0, World.voxelsInSingleChunk, x));
-        y = Mathf.Abs(ConvertRange(0, 1, 0, World.voxelsInSingleChunk, y));
-        z = Mathf.Abs(ConvertRange(0, 1, 0, World.voxelsInSingleChunk, z));
-
-        return new Vector3Int(Mathf.RoundToInt(x), Mathf.RoundToInt(y), Mathf.RoundToInt(z));
-    }
-
-    public static float ConvertRange(float originalStart, float originalEnd, float newStart, float newEnd, float value)
-    {
-        float scale = (newEnd - newStart) / (originalEnd - originalStart);
-        return (newStart + ((value - originalStart) * scale));
-    }
 }
