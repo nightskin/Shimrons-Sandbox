@@ -50,9 +50,9 @@ public class FirstPersonPlayer : MonoBehaviour
     {
         if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
         {
-            if (hit.transform.GetComponent<Chunk>())
+            if (hit.transform.GetComponent<Level>())
             {
-                Chunk chunk = hit.transform.GetComponent<Chunk>();
+                Level chunk = hit.transform.GetComponent<Level>();
                 Vector3 pointInTargetBlock = hit.transform.InverseTransformPoint(hit.point + (camera.transform.forward * 0.1f));
                 chunk.RemoveBlock(pointInTargetBlock);
             }
@@ -85,11 +85,6 @@ public class FirstPersonPlayer : MonoBehaviour
         if (actions.Move.ReadValue<Vector2>().magnitude > 0)
         {
 
-            //prevChunkLocation = chunkLocation;
-            //Calculate ChunkPos
-            //float chunkPosX = Mathf.Round(transform.position.x / ChunkManager.chunkSize) * ChunkManager.chunkSize;
-            //float chunkPosZ = Mathf.Round(transform.position.z / ChunkManager.chunkSize) * ChunkManager.chunkSize;
-            //chunkLocation = new Vector3(chunkPosX, 0, chunkPosZ);
         }
 
 
