@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class Level : MonoBehaviour
 {
+    public Gradient gradient;
+
     LevelSettings Settings;
     Voxel[] data = null;
     Mesh mesh;
@@ -15,6 +17,10 @@ public class Level : MonoBehaviour
     List<Color> colors = new List<Color>();
     int indexBuffer = 0;
 
+    void Start()
+    {
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+    }
 
     public void Reload()
     {
@@ -302,6 +308,5 @@ public class Level : MonoBehaviour
         mesh.colors = colors.ToArray();
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
-        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 }

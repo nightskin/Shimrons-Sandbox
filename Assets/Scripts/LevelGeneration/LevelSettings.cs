@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelSettings : MonoBehaviour
@@ -26,13 +24,11 @@ public class LevelSettings : MonoBehaviour
     public int layers = 2;
 
 
-    [SerializeField] GameObject player;
-    [SerializeField] GameObject level;
+    GameObject level;
     
 
     void OnValidate()
     {
-        if (!player) player = GameObject.FindWithTag("Player");
         level = transform.Find("Level").gameObject;
         noise = new Noise(seed.GetHashCode());
         level.GetComponent<Level>().Reload();     
@@ -41,6 +37,26 @@ public class LevelSettings : MonoBehaviour
     public float Evaluate2D(Vector3 point)
     {
         point = new Vector3(point.x, 0, point.z) * noiseScale;
+        float noiseValue = 0;
+        float frequency = baseRoughness;
+        float amplitude = 1;
+
+
+        for (int i = 0; i < layers; i++)
+        {
+            float v = noise.Evaluate(point * frequency);
+            noiseValue += (v + 1) * 0.5f * amplitude;
+            frequency *= roughness;
+            amplitude *= persistance;
+        }
+
+        noiseValue = Mathf.Max(minValue, noiseValue - minValue);
+        return noiseValue * strength;
+    }
+
+    public float Evaluate3D(Vector3 point)
+    {
+        point = point * noiseScale;
         float noiseValue = 0;
         float frequency = baseRoughness;
         float amplitude = 1;
@@ -85,7 +101,7 @@ public class LevelSettings : MonoBehaviour
         return pos.x + (pos.z * voxelsInSingleChunk) + (pos.y * (voxelsInSingleChunk * voxelsInSingleChunk));
     }
 
-    public static float ConvertRange(float originalStart, float originalEnd, float newStart, float newEnd, float value)
+    public float ConvertRange(float originalStart, float originalEnd, float newStart, float newEnd, float value)
     {
         float scale = (newEnd - newStart) / (originalEnd - originalStart);
         return (newStart + ((value - originalStart) * scale));
