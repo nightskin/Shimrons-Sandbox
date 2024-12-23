@@ -50,11 +50,9 @@ public class FirstPersonPlayer : MonoBehaviour
     {
         if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
         {
-            if (hit.transform.GetComponent<Level>())
+            if (hit.transform.tag == "Asteroid")
             {
-                Level chunk = hit.transform.GetComponent<Level>();
-                Vector3 pointInTargetBlock = hit.transform.InverseTransformPoint(hit.point + (camera.transform.forward * 0.1f));
-                chunk.RemoveBlock(pointInTargetBlock);
+                hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, 5);
             }
         }
     }
