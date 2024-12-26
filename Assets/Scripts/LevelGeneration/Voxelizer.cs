@@ -10,20 +10,28 @@ public class Voxelizer : MonoBehaviour
     public Vector3 scale = Vector3.one;
     public Quaternion rotation = Quaternion.identity;
 
-    Vector3 voxelSize;
-    Bounds bounds;
+    public Vector3 voxelSize;
+    public Bounds bounds;
     Mesh mesh;
-    Voxel[] data;
-    List<Vector3> verts = new List<Vector3>();
-    List<int> tris = new List<int>();
-    List<Color> colors = new List<Color>();
-    int indexBuffer = 0;
+    public Voxel[] data;
+    public List<Vector3> verts = new List<Vector3>();
+    public List<int> tris = new List<int>();
+    public List<Vector2> uvs = new List<Vector2>();
+    public int indexBuffer = 0;
 
 
     void Start()
     {
-        ConvertToVoxels();
+        mesh = new Mesh();
+        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+        mesh.vertices = verts.ToArray();
+        mesh.triangles = tris.ToArray();
+        mesh.uv = uvs.ToArray();
+        mesh.RecalculateNormals();
+
+        GetComponent<MeshFilter>().mesh = mesh;
         GetComponent<MeshCollider>().sharedMesh = mesh;
+
         transform.localScale = scale;
         transform.localRotation = rotation;
     }
@@ -53,102 +61,16 @@ public class Voxelizer : MonoBehaviour
         }
         else
         {
-            // rebuild mesh
-            verts.Clear();
-            tris.Clear();
-            colors.Clear();
-            indexBuffer = 0;
 
-            for (int i = 0; i < resolution * resolution * resolution; i++)
-            {
-                if (data[i].active)
-                {
-                    Vector3Int i3d = IndexToIndex3D(i);
-
-                    if (i3d.x < resolution - 1)
-                    {
-                        int t = Index3dToIndex(new Vector3Int(i3d.x + 1, i3d.y, i3d.z));
-                        if (!data[t].active)
-                        {
-                            CreateQuadRight(data[i].position, voxelSize, data[i].color);
-                        }
-                    }
-                    if (i3d.x > 0)
-                    {
-                        int t = Index3dToIndex(new Vector3Int(i3d.x - 1, i3d.y, i3d.z));
-                        if (!data[t].active)
-                        {
-                            CreateQuadLeft(data[i].position, voxelSize, data[i].color);
-                        }
-                    }
-                    if (i3d.x == 0)
-                    {
-                        CreateQuadLeft(data[i].position, voxelSize, data[i].color);
-                    }
-                    if (i3d.x == resolution - 1)
-                    {
-                        CreateQuadRight(data[i].position, voxelSize, data[i].color);
-                    }
-
-                    if (i3d.y < resolution - 1)
-                    {
-                        int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y + 1, i3d.z));
-                        if (!data[t].active)
-                        {
-                            CreateQuadTop(data[i].position, voxelSize, data[i].color);
-                        }
-                    }
-                    if (i3d.y > 0)
-                    {
-                        int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y - 1, i3d.z));
-                        if (!data[t].active)
-                        {
-                            CreateQuadBottom(data[i].position, voxelSize, data[i].color);
-                        }
-                    }
-                    if (i3d.y == 0)
-                    {
-                        CreateQuadBottom(data[i].position, voxelSize, data[i].color);
-                    }
-                    if (i3d.y == resolution - 1)
-                    {
-                        CreateQuadTop(data[i].position, voxelSize, data[i].color);
-                    }
-
-                    if (i3d.z < resolution - 1)
-                    {
-                        int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z + 1));
-                        if (!data[t].active)
-                        {
-                            CreateQuadFront(data[i].position, voxelSize, data[i].color);
-                        }
-                    }
-                    if (i3d.z > 0)
-                    {
-                        int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z - 1));
-                        if (!data[t].active)
-                        {
-                            CreateQuadBack(data[i].position, voxelSize, data[i].color);
-                        }
-                    }
-                    if (i3d.z == 0)
-                    {
-                        CreateQuadBack(data[i].position, voxelSize, data[i].color);
-                    }
-                    if (i3d.z == resolution - 1)
-                    {
-                        CreateQuadFront(data[i].position, voxelSize, data[i].color);
-                    }
-
-                }
-            }
-
+            CreateMeshData();
             mesh.Clear();
             mesh.vertices = verts.ToArray();
             mesh.triangles = tris.ToArray();
-            mesh.colors = colors.ToArray();
+            mesh.uv = uvs.ToArray();
             mesh.RecalculateNormals();
+
             GetComponent<MeshCollider>().sharedMesh = mesh;
+
         }
 
     }
@@ -183,9 +105,9 @@ public class Voxelizer : MonoBehaviour
         return false;
     }
 
-    void ConvertToVoxels()
+    public void CreateVoxelData()
     {
-        mesh = GetComponent<MeshFilter>().sharedMesh;
+        mesh = GetComponent<MeshCollider>().sharedMesh;
         data = new Voxel[resolution * resolution * resolution];
         bounds = mesh.bounds;
         voxelSize = new Vector3(bounds.size.x, bounds.size.y, bounds.size.z) / (resolution);
@@ -199,14 +121,19 @@ public class Voxelizer : MonoBehaviour
             float zp = ConvertRange(0, resolution, bounds.min.z, bounds.max.z, i3d.z);
             data[i] = new Voxel();
             data[i].position = new Vector3(xp, yp, zp);
-            data[i].color = Color.white;
             data[i].index = i;
             data[i].active = PointInMesh(data[i].position + transform.position);
         }
 
-        mesh = new Mesh();
-        mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        GetComponent<MeshFilter>().mesh = mesh;
+        Debug.Log(BlocksGone());
+    }
+
+    public void CreateMeshData()
+    {
+        verts.Clear();
+        tris.Clear();
+        uvs.Clear();
+        indexBuffer = 0;
 
         for (int i = 0; i < resolution * resolution * resolution; i++)
         {
@@ -219,7 +146,7 @@ public class Voxelizer : MonoBehaviour
                     int t = Index3dToIndex(new Vector3Int(i3d.x + 1, i3d.y, i3d.z));
                     if (!data[t].active)
                     {
-                        CreateQuadRight(data[i].position, voxelSize, data[i].color);
+                        CreateQuadRight(data[i].position, voxelSize);
                     }
                 }
                 if (i3d.x > 0)
@@ -227,16 +154,16 @@ public class Voxelizer : MonoBehaviour
                     int t = Index3dToIndex(new Vector3Int(i3d.x - 1, i3d.y, i3d.z));
                     if (!data[t].active)
                     {
-                        CreateQuadLeft(data[i].position, voxelSize, data[i].color);
+                        CreateQuadLeft(data[i].position, voxelSize);
                     }
                 }
                 if (i3d.x == 0)
                 {
-                    CreateQuadLeft(data[i].position, voxelSize, data[i].color);
+                    CreateQuadLeft(data[i].position, voxelSize);
                 }
                 if (i3d.x == resolution - 1)
                 {
-                    CreateQuadRight(data[i].position, voxelSize, data[i].color);
+                    CreateQuadRight(data[i].position, voxelSize);
                 }
 
                 if (i3d.y < resolution - 1)
@@ -244,7 +171,7 @@ public class Voxelizer : MonoBehaviour
                     int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y + 1, i3d.z));
                     if (!data[t].active)
                     {
-                        CreateQuadTop(data[i].position, voxelSize, data[i].color);
+                        CreateQuadTop(data[i].position, voxelSize);
                     }
                 }
                 if (i3d.y > 0)
@@ -252,16 +179,16 @@ public class Voxelizer : MonoBehaviour
                     int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y - 1, i3d.z));
                     if (!data[t].active)
                     {
-                        CreateQuadBottom(data[i].position, voxelSize, data[i].color);
+                        CreateQuadBottom(data[i].position, voxelSize);
                     }
                 }
                 if (i3d.y == 0)
                 {
-                    CreateQuadBottom(data[i].position, voxelSize, data[i].color);
+                    CreateQuadBottom(data[i].position, voxelSize);
                 }
                 if (i3d.y == resolution - 1)
                 {
-                    CreateQuadTop(data[i].position, voxelSize, data[i].color);
+                    CreateQuadTop(data[i].position, voxelSize);
                 }
 
                 if (i3d.z < resolution - 1)
@@ -269,7 +196,7 @@ public class Voxelizer : MonoBehaviour
                     int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z + 1));
                     if (!data[t].active)
                     {
-                        CreateQuadFront(data[i].position, voxelSize, data[i].color);
+                        CreateQuadFront(data[i].position, voxelSize);
                     }
                 }
                 if (i3d.z > 0)
@@ -277,26 +204,21 @@ public class Voxelizer : MonoBehaviour
                     int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z - 1));
                     if (!data[t].active)
                     {
-                        CreateQuadBack(data[i].position, voxelSize, data[i].color);
+                        CreateQuadBack(data[i].position, voxelSize);
                     }
                 }
                 if (i3d.z == 0)
                 {
-                    CreateQuadBack(data[i].position, voxelSize, data[i].color);
+                    CreateQuadBack(data[i].position, voxelSize);
                 }
                 if (i3d.z == resolution - 1)
                 {
-                    CreateQuadFront(data[i].position, voxelSize, data[i].color);
+                    CreateQuadFront(data[i].position, voxelSize);
                 }
 
             }
         }
-
-        mesh.Clear();
-        mesh.vertices = verts.ToArray();
-        mesh.triangles = tris.ToArray();
-        mesh.colors = colors.ToArray();
-        mesh.RecalculateNormals();
+        
     }
 
     int Index3dToIndex(Vector3Int i3d)
@@ -312,7 +234,7 @@ public class Voxelizer : MonoBehaviour
         return new Vector3Int(x, y, z);
     }
 
-    void CreateQuadBack(Vector3 position, Vector3 size, Color color)
+    void CreateQuadBack(Vector3 position, Vector3 size)
     {
         verts.Add(new Vector3(-0.5f * size.x, 0.5f * size.y, -0.5f * size.z) + position);
         verts.Add(new Vector3(0.5f * size.x, -0.5f * size.y, -0.5f * size.z) + position);
@@ -327,15 +249,15 @@ public class Voxelizer : MonoBehaviour
         tris.Add(3 + indexBuffer);
         tris.Add(1 + indexBuffer);
 
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
 
         indexBuffer += 4;
     }
 
-    void CreateQuadFront(Vector3 position, Vector3 size, Color color)
+    void CreateQuadFront(Vector3 position, Vector3 size)
     {
         verts.Add(new Vector3(-0.5f * size.x, 0.5f * size.y, 0.5f * size.z) + position);
         verts.Add(new Vector3(0.5f * size.x, -0.5f * size.y, 0.5f * size.z) + position);
@@ -350,15 +272,15 @@ public class Voxelizer : MonoBehaviour
         tris.Add(0 + indexBuffer);
         tris.Add(1 + indexBuffer);
 
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
 
         indexBuffer += 4;
     }
 
-    void CreateQuadRight(Vector3 position, Vector3 size, Color color)
+    void CreateQuadRight(Vector3 position, Vector3 size)
     {
         verts.Add(new Vector3(0.5f * size.x, 0.5f * size.y, 0.5f * size.z) + position);
         verts.Add(new Vector3(0.5f * size.x, -0.5f * size.y, 0.5f * size.z) + position);
@@ -373,15 +295,15 @@ public class Voxelizer : MonoBehaviour
         tris.Add(2 + indexBuffer);
         tris.Add(3 + indexBuffer);
 
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
 
         indexBuffer += 4;
     }
 
-    void CreateQuadLeft(Vector3 position, Vector3 size, Color color)
+    void CreateQuadLeft(Vector3 position, Vector3 size)
     {
         verts.Add(new Vector3(-0.5f * size.x, 0.5f * size.y, 0.5f * size.z) + position);
         verts.Add(new Vector3(-0.5f * size.x, -0.5f * size.y, 0.5f  * size.z) + position);
@@ -396,15 +318,15 @@ public class Voxelizer : MonoBehaviour
         tris.Add(1 + indexBuffer);
         tris.Add(3 + indexBuffer);
 
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
 
         indexBuffer += 4;
     }
 
-    void CreateQuadBottom(Vector3 position, Vector3 size, Color color)
+    void CreateQuadBottom(Vector3 position, Vector3 size)
     {
         verts.Add(new Vector3(-0.5f * size.x, -0.5f * size.y, -0.5f * size.z) + position);
         verts.Add(new Vector3(-0.5f * size.x, -0.5f * size.y, 0.5f  * size.z) + position);
@@ -419,16 +341,16 @@ public class Voxelizer : MonoBehaviour
         tris.Add(1 + indexBuffer);
         tris.Add(2 + indexBuffer);
 
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
 
         indexBuffer += 4;
 
     }
 
-    void CreateQuadTop(Vector3 position, Vector3 size, Color color)
+    void CreateQuadTop(Vector3 position, Vector3 size)
     {
         verts.Add(new Vector3(-0.5f * size.x, 0.5f * size.y, -0.5f * size.z) + position);
         verts.Add(new Vector3(-0.5f * size.x, 0.5f * size.y, 0.5f * size.z) + position);
@@ -443,10 +365,10 @@ public class Voxelizer : MonoBehaviour
         tris.Add(3 + indexBuffer);
         tris.Add(2 + indexBuffer);
 
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
-        colors.Add(color);
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
 
         indexBuffer += 4;
 
