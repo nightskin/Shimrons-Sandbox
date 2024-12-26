@@ -13,7 +13,7 @@ public class Voxelizer : MonoBehaviour
     Vector3 voxelSize;
     Bounds bounds;
     Mesh mesh;
-    Voxel[,,] data;
+    Voxel[] data;
     List<Vector3> verts = new List<Vector3>();
     List<int> tris = new List<int>();
     List<Color> colors = new List<Color>();
@@ -35,19 +35,13 @@ public class Voxelizer : MonoBehaviour
         float scaler = Mathf.Max(voxelSize.x, voxelSize.y, voxelSize.z);
         radius *= scaler;
 
-        for(int x = 0; x < resolution; x++)
+        for(int i = 0; i < resolution * resolution * resolution; i++)
         {
-            for(int y = 0; y < resolution; y++)
+            if (data[i].active)
             {
-                for (int z = 0; z < resolution; z++)
+                if (Vector3.Distance(point, data[i].position) < radius)
                 {
-                    if (data[x,y,z].active)
-                    {
-                        if(Vector3.Distance(point, data[x,y,z].position) < radius)
-                        {
-                            data[x, y, z].active = false;
-                        }
-                    }
+                    data[i].active = false;
                 }
             }
         }
@@ -64,87 +58,91 @@ public class Voxelizer : MonoBehaviour
             tris.Clear();
             colors.Clear();
             indexBuffer = 0;
-            for (int x = 0; x < resolution; x++)
+
+            for (int i = 0; i < resolution * resolution * resolution; i++)
             {
-                for (int y = 0; y < resolution; y++)
+                if (data[i].active)
                 {
-                    for (int z = 0; z < resolution; z++)
+                    Vector3Int i3d = IndexToIndex3D(i);
+
+                    if (i3d.x < resolution - 1)
                     {
-                        if (data[x, y, z].active)
+                        int t = Index3dToIndex(new Vector3Int(i3d.x + 1, i3d.y, i3d.z));
+                        if (!data[t].active)
                         {
-                            if (x < resolution - 1)
-                            {
-                                if (!data[x + 1, y, z].active)
-                                {
-                                    CreateQuadRight(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                                }
-                            }
-                            if (x > 0)
-                            {
-                                if (!data[x - 1, y, z].active)
-                                {
-                                    CreateQuadLeft(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                                }
-                            }
-                            if (x == 0)
-                            {
-                                CreateQuadLeft(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                            if (x == resolution - 1)
-                            {
-                                CreateQuadRight(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-
-                            if (y < resolution - 1)
-                            {
-                                if (!data[x, y + 1, z].active)
-                                {
-                                    CreateQuadTop(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                                }
-                            }
-                            if (y > 0)
-                            {
-                                if (!data[x, y - 1, z].active)
-                                {
-                                    CreateQuadBottom(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                                }
-                            }
-                            if (y == 0)
-                            {
-                                CreateQuadBottom(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                            if (y == resolution - 1)
-                            {
-                                CreateQuadTop(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-
-                            if (z < resolution - 1)
-                            {
-                                if (!data[x, y, z + 1].active)
-                                {
-                                    CreateQuadFront(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                                }
-                            }
-                            if (z > 0)
-                            {
-                                if (!data[x, y, z - 1].active)
-                                {
-                                    CreateQuadBack(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                                }
-                            }
-                            if (z == 0)
-                            {
-                                CreateQuadBack(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                            if (z == resolution - 1)
-                            {
-                                CreateQuadFront(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-
+                            CreateQuadRight(data[i].position, voxelSize, data[i].color);
                         }
                     }
+                    if (i3d.x > 0)
+                    {
+                        int t = Index3dToIndex(new Vector3Int(i3d.x - 1, i3d.y, i3d.z));
+                        if (!data[t].active)
+                        {
+                            CreateQuadLeft(data[i].position, voxelSize, data[i].color);
+                        }
+                    }
+                    if (i3d.x == 0)
+                    {
+                        CreateQuadLeft(data[i].position, voxelSize, data[i].color);
+                    }
+                    if (i3d.x == resolution - 1)
+                    {
+                        CreateQuadRight(data[i].position, voxelSize, data[i].color);
+                    }
+
+                    if (i3d.y < resolution - 1)
+                    {
+                        int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y + 1, i3d.z));
+                        if (!data[t].active)
+                        {
+                            CreateQuadTop(data[i].position, voxelSize, data[i].color);
+                        }
+                    }
+                    if (i3d.y > 0)
+                    {
+                        int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y - 1, i3d.z));
+                        if (!data[t].active)
+                        {
+                            CreateQuadBottom(data[i].position, voxelSize, data[i].color);
+                        }
+                    }
+                    if (i3d.y == 0)
+                    {
+                        CreateQuadBottom(data[i].position, voxelSize, data[i].color);
+                    }
+                    if (i3d.y == resolution - 1)
+                    {
+                        CreateQuadTop(data[i].position, voxelSize, data[i].color);
+                    }
+
+                    if (i3d.z < resolution - 1)
+                    {
+                        int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z + 1));
+                        if (!data[t].active)
+                        {
+                            CreateQuadFront(data[i].position, voxelSize, data[i].color);
+                        }
+                    }
+                    if (i3d.z > 0)
+                    {
+                        int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z - 1));
+                        if (!data[t].active)
+                        {
+                            CreateQuadBack(data[i].position, voxelSize, data[i].color);
+                        }
+                    }
+                    if (i3d.z == 0)
+                    {
+                        CreateQuadBack(data[i].position, voxelSize, data[i].color);
+                    }
+                    if (i3d.z == resolution - 1)
+                    {
+                        CreateQuadFront(data[i].position, voxelSize, data[i].color);
+                    }
+
                 }
             }
+
             mesh.Clear();
             mesh.vertices = verts.ToArray();
             mesh.triangles = tris.ToArray();
@@ -163,17 +161,11 @@ public class Voxelizer : MonoBehaviour
 
     bool BlocksGone()
     {
-        for (int x = 0; x < resolution; x++)
+        for (int i = 0; i < resolution * resolution * resolution; i++)
         {
-            for (int y = 0; y < resolution; y++)
+            if (data[i].active)
             {
-                for (int z = 0; z < resolution; z++)
-                {
-                    if (data[x, y, z].active)
-                    {
-                        return false;
-                    }
-                }
+                return false;
             }
         }
 
@@ -194,111 +186,109 @@ public class Voxelizer : MonoBehaviour
     void ConvertToVoxels()
     {
         mesh = GetComponent<MeshFilter>().sharedMesh;
-        data = new Voxel[resolution, resolution, resolution];
+        data = new Voxel[resolution * resolution * resolution];
         bounds = mesh.bounds;
         voxelSize = new Vector3(bounds.size.x, bounds.size.y, bounds.size.z) / (resolution);
         
-        for (int x = 0; x < resolution; x++)
+        for (int i = 0; i < resolution * resolution * resolution; i++)
         {
-            for (int y = 0; y < resolution; y++)
-            {
-                for (int z = 0; z < resolution; z++)
-                {
-                    float xp = ConvertRange(0, resolution, bounds.min.x, bounds.max.x, x);
-                    float yp = ConvertRange(0, resolution, bounds.min.y, bounds.max.y, y);
-                    float zp = ConvertRange(0, resolution, bounds.min.z, bounds.max.z, z);
-                    data[x, y, z] = new Voxel();
-                    data[x, y, z].position = new Vector3(xp, yp, zp);
-                    data[x, y, z].color = Color.white;
-                    data[x, y, z].index = new Vector3Int(x, y, z);
-                    data[x, y, z].active = PointInMesh(data[x, y, z].position + transform.position);
-                }
-            }
+            Vector3Int i3d = IndexToIndex3D(i);
+
+            float xp = ConvertRange(0, resolution, bounds.min.x, bounds.max.x, i3d.x);
+            float yp = ConvertRange(0, resolution, bounds.min.y, bounds.max.y, i3d.y);
+            float zp = ConvertRange(0, resolution, bounds.min.z, bounds.max.z, i3d.z);
+            data[i] = new Voxel();
+            data[i].position = new Vector3(xp, yp, zp);
+            data[i].color = Color.white;
+            data[i].index = i;
+            data[i].active = PointInMesh(data[i].position + transform.position);
         }
 
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         GetComponent<MeshFilter>().mesh = mesh;
 
-        for (int x = 0; x < resolution; x++)
+        for (int i = 0; i < resolution * resolution * resolution; i++)
         {
-            for (int y = 0; y < resolution; y++)
+            if (data[i].active)
             {
-                for (int z = 0; z < resolution; z++)
+                Vector3Int i3d = IndexToIndex3D(i);
+
+                if (i3d.x < resolution - 1)
                 {
-                    if (data[x,y,z].active) 
+                    int t = Index3dToIndex(new Vector3Int(i3d.x + 1, i3d.y, i3d.z));
+                    if (!data[t].active)
                     {
-                        if(x < resolution - 1)
-                        {
-                            if (!data[x + 1, y, z].active)
-                            {
-                                CreateQuadRight(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                        }
-                        if(x > 0)
-                        {
-                            if (!data[x - 1, y, z].active)
-                            {
-                                CreateQuadLeft(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                        }
-                        if (x == 0)
-                        {
-                            CreateQuadLeft(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                        }
-                        if (x == resolution - 1)
-                        {
-                            CreateQuadRight(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                        }
-
-                        if (y < resolution - 1)
-                        {
-                            if (!data[x, y + 1, z].active)
-                            {
-                                CreateQuadTop(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                        }
-                        if (y > 0)
-                        {
-                            if (!data[x, y - 1, z].active)
-                            {
-                                CreateQuadBottom(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                        }
-                        if (y == 0)
-                        {
-                            CreateQuadBottom(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                        }
-                        if (y == resolution - 1)
-                        {
-                            CreateQuadTop(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                        }
-
-                        if (z < resolution - 1)
-                        {
-                            if (!data[x, y, z + 1].active)
-                            {
-                                CreateQuadFront(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                        }
-                        if (z > 0)
-                        {
-                            if (!data[x, y, z - 1].active)
-                            {
-                                CreateQuadBack(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                            }
-                        }
-                        if (z == 0)
-                        {
-                            CreateQuadBack(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                        }
-                        if (z == resolution - 1)
-                        {
-                            CreateQuadFront(data[x, y, z].position, voxelSize, data[x, y, z].color);
-                        }
-
+                        CreateQuadRight(data[i].position, voxelSize, data[i].color);
                     }
                 }
+                if (i3d.x > 0)
+                {
+                    int t = Index3dToIndex(new Vector3Int(i3d.x - 1, i3d.y, i3d.z));
+                    if (!data[t].active)
+                    {
+                        CreateQuadLeft(data[i].position, voxelSize, data[i].color);
+                    }
+                }
+                if (i3d.x == 0)
+                {
+                    CreateQuadLeft(data[i].position, voxelSize, data[i].color);
+                }
+                if (i3d.x == resolution - 1)
+                {
+                    CreateQuadRight(data[i].position, voxelSize, data[i].color);
+                }
+
+                if (i3d.y < resolution - 1)
+                {
+                    int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y + 1, i3d.z));
+                    if (!data[t].active)
+                    {
+                        CreateQuadTop(data[i].position, voxelSize, data[i].color);
+                    }
+                }
+                if (i3d.y > 0)
+                {
+                    int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y - 1, i3d.z));
+                    if (!data[t].active)
+                    {
+                        CreateQuadBottom(data[i].position, voxelSize, data[i].color);
+                    }
+                }
+                if (i3d.y == 0)
+                {
+                    CreateQuadBottom(data[i].position, voxelSize, data[i].color);
+                }
+                if (i3d.y == resolution - 1)
+                {
+                    CreateQuadTop(data[i].position, voxelSize, data[i].color);
+                }
+
+                if (i3d.z < resolution - 1)
+                {
+                    int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z + 1));
+                    if (!data[t].active)
+                    {
+                        CreateQuadFront(data[i].position, voxelSize, data[i].color);
+                    }
+                }
+                if (i3d.z > 0)
+                {
+                    int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z - 1));
+                    if (!data[t].active)
+                    {
+                        CreateQuadBack(data[i].position, voxelSize, data[i].color);
+                    }
+                }
+                if (i3d.z == 0)
+                {
+                    CreateQuadBack(data[i].position, voxelSize, data[i].color);
+                }
+                if (i3d.z == resolution - 1)
+                {
+                    CreateQuadFront(data[i].position, voxelSize, data[i].color);
+                }
+
             }
         }
 
@@ -307,6 +297,19 @@ public class Voxelizer : MonoBehaviour
         mesh.triangles = tris.ToArray();
         mesh.colors = colors.ToArray();
         mesh.RecalculateNormals();
+    }
+
+    int Index3dToIndex(Vector3Int i3d)
+    {
+        return i3d.x + (i3d.z * resolution) + (i3d.y * (resolution * resolution));
+    }
+
+    Vector3Int IndexToIndex3D(int i)
+    {
+        int x = i % resolution;
+        int z = (i / resolution) % resolution;
+        int y = ((i / resolution)/resolution) % resolution;
+        return new Vector3Int(x, y, z);
     }
 
     void CreateQuadBack(Vector3 position, Vector3 size, Color color)

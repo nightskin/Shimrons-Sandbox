@@ -7,5 +7,5 @@ public struct Voxel
     public Color color;
     public bool active;
     public Vector3 position;
-    public Vector3Int index;
+    public int index;
 }
