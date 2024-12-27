@@ -4,11 +4,12 @@ public class AsteroidField : MonoBehaviour
 {
     [SerializeField][Min(1)] int minAsteroids = 5;
     [SerializeField][Min(2)] int maxAsteroids = 10;
+    [SerializeField] int numberOfAsteroids;
     [SerializeField] GameObject[] asteroidPrefabs;
     
     void Start()
     {
-        int numberOfAsteroids = Random.Range(minAsteroids, maxAsteroids + 1);
+        numberOfAsteroids = Random.Range(minAsteroids, maxAsteroids + 1);
         for (int i = 0; i < numberOfAsteroids; i++)
         {
             Vector3 pos = Random.insideUnitSphere * Galaxy.qaudrantSize;

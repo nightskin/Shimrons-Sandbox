@@ -48,3 +48,5 @@ MonoBehaviour:
   maxAsteroids: 10
   asteroidPrefabs:
   - {fileID: 8119712312623133773, guid: 03185e2c4af16f349885b0ab8ec54d81, type: 3}
+  - {fileID: 8769023136934939983, guid: 60854b3cfa2249141aef3cf9335c845a, type: 3}
+  - {fileID: 1678880164474620994, guid: 53dc0f2e894f2184facd2f10c42eba00, type: 3}
