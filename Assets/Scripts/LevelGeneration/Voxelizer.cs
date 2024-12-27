@@ -75,12 +75,6 @@ public class Voxelizer : MonoBehaviour
 
     }
 
-    float ConvertRange(float originalStart, float originalEnd, float newStart, float newEnd, float value)
-    {
-        float scale = (newEnd - newStart) / (originalEnd - originalStart);
-        return (newStart + ((value - originalStart) * scale));
-    }
-
     bool BlocksGone()
     {
         for (int i = 0; i < resolution * resolution * resolution; i++)
@@ -114,11 +108,11 @@ public class Voxelizer : MonoBehaviour
         
         for (int i = 0; i < resolution * resolution * resolution; i++)
         {
-            Vector3Int i3d = IndexToIndex3D(i);
+            Vector3Int i3d = Util.IndexToIndex3D(i, resolution);
 
-            float xp = ConvertRange(0, resolution, bounds.min.x, bounds.max.x, i3d.x);
-            float yp = ConvertRange(0, resolution, bounds.min.y, bounds.max.y, i3d.y);
-            float zp = ConvertRange(0, resolution, bounds.min.z, bounds.max.z, i3d.z);
+            float xp = Util.ConvertRange(0, resolution, bounds.min.x, bounds.max.x, i3d.x);
+            float yp = Util.ConvertRange(0, resolution, bounds.min.y, bounds.max.y, i3d.y);
+            float zp = Util.ConvertRange(0, resolution, bounds.min.z, bounds.max.z, i3d.z);
             data[i] = new Voxel();
             data[i].position = new Vector3(xp, yp, zp);
             data[i].index = i;
@@ -139,11 +133,11 @@ public class Voxelizer : MonoBehaviour
         {
             if (data[i].active)
             {
-                Vector3Int i3d = IndexToIndex3D(i);
+                Vector3Int i3d = Util.IndexToIndex3D(i, resolution);
 
                 if (i3d.x < resolution - 1)
                 {
-                    int t = Index3dToIndex(new Vector3Int(i3d.x + 1, i3d.y, i3d.z));
+                    int t = Util.Index3dToIndex(new Vector3Int(i3d.x + 1, i3d.y, i3d.z), resolution);
                     if (!data[t].active)
                     {
                         CreateQuadRight(data[i].position, voxelSize);
@@ -151,7 +145,7 @@ public class Voxelizer : MonoBehaviour
                 }
                 if (i3d.x > 0)
                 {
-                    int t = Index3dToIndex(new Vector3Int(i3d.x - 1, i3d.y, i3d.z));
+                    int t = Util.Index3dToIndex(new Vector3Int(i3d.x - 1, i3d.y, i3d.z), resolution);
                     if (!data[t].active)
                     {
                         CreateQuadLeft(data[i].position, voxelSize);
@@ -168,7 +162,7 @@ public class Voxelizer : MonoBehaviour
 
                 if (i3d.y < resolution - 1)
                 {
-                    int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y + 1, i3d.z));
+                    int t = Util.Index3dToIndex(new Vector3Int(i3d.x, i3d.y + 1, i3d.z), resolution);
                     if (!data[t].active)
                     {
                         CreateQuadTop(data[i].position, voxelSize);
@@ -176,7 +170,7 @@ public class Voxelizer : MonoBehaviour
                 }
                 if (i3d.y > 0)
                 {
-                    int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y - 1, i3d.z));
+                    int t = Util.Index3dToIndex(new Vector3Int(i3d.x, i3d.y - 1, i3d.z), resolution);
                     if (!data[t].active)
                     {
                         CreateQuadBottom(data[i].position, voxelSize);
@@ -193,7 +187,7 @@ public class Voxelizer : MonoBehaviour
 
                 if (i3d.z < resolution - 1)
                 {
-                    int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z + 1));
+                    int t = Util.Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z + 1), resolution);
                     if (!data[t].active)
                     {
                         CreateQuadFront(data[i].position, voxelSize);
@@ -201,7 +195,7 @@ public class Voxelizer : MonoBehaviour
                 }
                 if (i3d.z > 0)
                 {
-                    int t = Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z - 1));
+                    int t = Util.Index3dToIndex(new Vector3Int(i3d.x, i3d.y, i3d.z - 1), resolution);
                     if (!data[t].active)
                     {
                         CreateQuadBack(data[i].position, voxelSize);
@@ -219,19 +213,6 @@ public class Voxelizer : MonoBehaviour
             }
         }
         
-    }
-
-    int Index3dToIndex(Vector3Int i3d)
-    {
-        return i3d.x + (i3d.z * resolution) + (i3d.y * (resolution * resolution));
-    }
-
-    Vector3Int IndexToIndex3D(int i)
-    {
-        int x = i % resolution;
-        int z = (i / resolution) % resolution;
-        int y = ((i / resolution)/resolution) % resolution;
-        return new Vector3Int(x, y, z);
     }
 
     void CreateQuadBack(Vector3 position, Vector3 size)

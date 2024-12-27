@@ -9,3 +9,4 @@ public struct Voxel
     public Vector3 position;
     public int index;
 }
+

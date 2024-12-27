@@ -40,7 +40,6 @@ public class Galaxy : MonoBehaviour
                         float y = noise.Evaluate(new Vector3(x, 0, z));
                         Vector3 pos = new Vector3(x, y, z) * qaudrantSize;
                         GameObject obj = Instantiate(asteroidFieldPrefab, pos, Quaternion.identity, transform);
-                        obj.isStatic = true;
                         quadrants.Add(obj);
                     }
                 }
@@ -51,7 +50,6 @@ public class Galaxy : MonoBehaviour
                         float y = noise.Evaluate(new Vector3(x, 0, z));
                         Vector3 pos = new Vector3(x, y, z) * qaudrantSize;
                         GameObject obj = Instantiate(planetPrefab, pos, Quaternion.identity, transform);
-                        obj.isStatic = true;
                         quadrants.Add(obj);
                     } 
                 }
@@ -62,7 +60,6 @@ public class Galaxy : MonoBehaviour
                         float y = noise.Evaluate(new Vector3(x, 0, z));
                         Vector3 pos = new Vector3(x, y, z) * qaudrantSize;
                         GameObject obj = Instantiate(enemyFleatPrefab, pos, Quaternion.identity, transform);
-                        obj.isStatic = true;
                         quadrants.Add(obj);
                     }
                 }

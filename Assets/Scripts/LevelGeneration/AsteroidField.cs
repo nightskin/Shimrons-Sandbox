@@ -24,5 +24,4 @@ public class AsteroidField : MonoBehaviour
             
         }
     }
-
 }
