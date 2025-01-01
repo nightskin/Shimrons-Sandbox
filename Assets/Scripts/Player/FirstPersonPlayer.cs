@@ -3,43 +3,49 @@ using UnityEngine.UI;
 
 public class FirstPersonPlayer : MonoBehaviour
 {
-    //For Terrain
-    public Vector3 prevChunkLocation;
-    public Vector3 chunkLocation;
+
+    ObjectPool bulletPool;
 
 
     // For Input
     Controls controls;
     public Controls.PlayerActions actions;
-    
+
     //Components
-    public Transform camera;
+    [SerializeField] Transform shootPointLeft;
+    [SerializeField] Transform shootPointRight;
+    [SerializeField] Transform camera;
     [SerializeField] CharacterController controller;
     [SerializeField] Transform cameraBob;
 
     // For basic motion
     Vector3 moveDirection;
-    public float speed = 15;
-
+    float speed;
+    [SerializeField] float normalSpeed = 15;
+    [SerializeField] float dashSpeed = 50;
 
     //For Look/Aim
-    public float lookSpeed = 100;
+    [SerializeField] float lookSpeed = 100;
     float xRot = 0;
     float yRot = 0;
 
 
     void Awake()
     {
+        speed = normalSpeed;
+        bulletPool = GameObject.Find("BulletPool").GetComponent<ObjectPool>();
+
         Cursor.lockState = CursorLockMode.Locked;
         controls = new Controls();
         actions = controls.Player;
         actions.Enable();
 
         actions.Dash.performed += Dash_performed;
+        actions.Dash.canceled += Dash_canceled;
         actions.PrimaryFire.performed += PrimaryFire_performed;
         actions.SecondaryFire.performed += SecondaryFire_performed;
     }
-
+    
     void Update()
     {
         Look();
@@ -48,13 +54,9 @@ public class FirstPersonPlayer : MonoBehaviour
 
     private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if (Physics.Raycast(camera.position, camera.forward, out RaycastHit hit))
-        {
-            if (hit.transform.tag == "Asteroid")
-            {
-                hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, 5);
-            }
-        }
+        GameObject p = bulletPool.Spawn(shootPointRight.position);
+        p.GetComponent<Bullet>().owner = gameObject;
+        p.GetComponent<Bullet>().direction = camera.forward;
     }
 
     private void SecondaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -64,7 +66,12 @@ public class FirstPersonPlayer : MonoBehaviour
 
     void Dash_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        
+        speed = dashSpeed;
+    }
+
+    private void Dash_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        speed = normalSpeed;
     }
 
     void Movement()
@@ -78,14 +85,7 @@ public class FirstPersonPlayer : MonoBehaviour
         //Move Normally
         moveDirection = camera.transform.right * x + camera.transform.forward * z + camera.transform.up * y;
         controller.Move(moveDirection * speed * Time.deltaTime);
-
-
-        if (actions.Move.ReadValue<Vector2>().magnitude > 0)
-        {
-
-        }
-
-
+        
     }
 
     void Look()
