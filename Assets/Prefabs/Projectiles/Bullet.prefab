@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 2473978273754124844}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -143,7 +143,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0.1
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -192,7 +192,7 @@ TrailRenderer:
       m_ColorSpace: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
-    numCornerVertices: 0
+    numCornerVertices: 5
     numCapVertices: 5
     alignment: 0
     textureMode: 0
@@ -216,8 +216,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a447aaf814c6b6247bf8b5ff1316f890, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blastRadius: 10
+  lifeTime: 5
+  blastRadius: 5
   radius: 0.05
   owner: {fileID: 0}
   direction: {x: 0, y: 0, z: 0}
-  speed: 100
+  speed: 200

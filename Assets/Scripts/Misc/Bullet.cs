@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public float lifeTime = 3;
     public float blastRadius = 10;
     public float radius = 0.5f;
     public GameObject owner;
@@ -11,6 +12,7 @@ public class Bullet : MonoBehaviour
 
 
     private Vector3 previousPosition;
+    private float timer;
 
     void OnDrawGizmos()
     {
@@ -18,9 +20,9 @@ public class Bullet : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, radius);
     }
 
-    void Start()
+    void OnEnable()
     {
-        
+        timer = lifeTime;
     }
 
     void Update()
@@ -30,7 +32,8 @@ public class Bullet : MonoBehaviour
         
         CheckCollisions();  
 
-        if(Vector3.Distance(transform.position, owner.transform.position) > Camera.main.farClipPlane)
+        timer -= Time.deltaTime;
+        if(timer < 0) 
         {
             gameObject.SetActive(false);
         }
@@ -42,9 +45,14 @@ public class Bullet : MonoBehaviour
         float distance = Vector3.Distance(previousPosition, transform.position);
         if(Physics.SphereCast(previousPosition, radius, direction , out RaycastHit hit ,distance))
         {
-            if(hit.transform.tag == "VoxelMesh")
+            if(hit.transform.tag == "Asteroid")
             {
                 hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, blastRadius);
+                gameObject.SetActive(false);
+            }
+            else if(hit.transform.tag == "Planet")
+            {
+                hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, 1);
                 gameObject.SetActive(false);
             }
         }

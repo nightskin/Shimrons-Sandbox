@@ -8,6 +8,8 @@ public class Galaxy : MonoBehaviour
     [Min(1)] public static float qaudrantSize = 250;
     public static Noise noise;
 
+    [SerializeField] Transform player;
+    [SerializeField] Color spaceColor = Color.white;
     [SerializeField] GameObject asteroidFieldPrefab;
     [SerializeField] GameObject planetPrefab;
     [SerializeField] GameObject enemyFleatPrefab;
@@ -19,7 +21,10 @@ public class Galaxy : MonoBehaviour
         quadrants = new List<GameObject>();
         noise = new Noise(seed.GetHashCode());
         Random.InitState(seed.GetHashCode());
-        
+
+        spaceColor = Util.RandomColor();
+        RenderSettings.skybox.SetColor("_Tint", spaceColor);
+
         for (int x = -size.x/2; x < size.x/2; x++) 
         {
             for (int z = -size.y/2; z < size.y; z++) 
@@ -31,7 +36,11 @@ public class Galaxy : MonoBehaviour
                 // 3 == enemyFleet
                 if(i == 0)
                 {
-                    continue;
+                    if(player)
+                    {
+                        float y = noise.Evaluate(new Vector3(x, 0, z));
+                        player.position = new Vector3(x, y, z) * qaudrantSize;
+                    }
                 }
                 else if(i == 1)
                 { 

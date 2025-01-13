@@ -1,22 +1,18 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class FirstPersonPlayer : MonoBehaviour
 {
 
-    ObjectPool bulletPool;
 
-
+    
     // For Input
     Controls controls;
     public Controls.PlayerActions actions;
 
     //Components
-    [SerializeField] Transform shootPointLeft;
-    [SerializeField] Transform shootPointRight;
-    [SerializeField] Transform camera;
-    [SerializeField] CharacterController controller;
-    [SerializeField] Transform cameraBob;
+    Camera camera;
+    CharacterController controller;
+    ObjectPool bulletPool;
 
     // For basic motion
     Vector3 moveDirection;
@@ -29,10 +25,15 @@ public class FirstPersonPlayer : MonoBehaviour
     float xRot = 0;
     float yRot = 0;
 
+    //For Shooting
+    [SerializeField] Vector3 shootOffset = new Vector3(0, -0.1f, 0.1f);
+
 
     void Awake()
     {
         speed = normalSpeed;
+        controller = GetComponent<CharacterController>();
+        camera = Camera.main;
         bulletPool = GameObject.Find("BulletPool").GetComponent<ObjectPool>();
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -54,9 +55,18 @@ public class FirstPersonPlayer : MonoBehaviour
 
     private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        GameObject p = bulletPool.Spawn(shootPointRight.position);
+        Vector3 shootPoint = camera.transform.position + shootOffset;
+        GameObject p = bulletPool.Spawn(shootPoint);
         p.GetComponent<Bullet>().owner = gameObject;
-        p.GetComponent<Bullet>().direction = camera.forward;
+
+        if (Physics.Raycast(shootPoint, camera.transform.forward, out RaycastHit hit ,camera.farClipPlane))
+        {
+            p.GetComponent<Bullet>().direction = (hit.point - shootPoint).normalized;
+        }
+        else
+        {
+            p.GetComponent<Bullet>().direction = camera.transform.forward;
+        }
     }
 
     private void SecondaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -101,7 +111,7 @@ public class FirstPersonPlayer : MonoBehaviour
         yRot += x * lookSpeed * Time.deltaTime;
 
         transform.localEulerAngles = new Vector3(0, yRot, 0);
-        camera.localEulerAngles = new Vector3(xRot, 0, 0);
+        camera.transform.localEulerAngles = new Vector3(xRot, 0, 0);
 
     }
 

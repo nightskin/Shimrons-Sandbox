@@ -4,8 +4,9 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - VoxelMesh
   - Projectile
+  - Asteroid
+  - Planet
   layers:
   - Default
   - TransparentFX
