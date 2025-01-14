@@ -64,19 +64,19 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""PrimaryFire"",
+                    ""name"": ""Fire"",
                     ""type"": ""Button"",
                     ""id"": ""96cd0cc9-4fe8-4689-9a94-df33aeb923a8"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""SecondaryFire"",
+                    ""name"": ""LockOn"",
                     ""type"": ""Button"",
                     ""id"": ""6449aa72-1b91-413f-b190-91bed85bfee4"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -85,7 +85,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""Dash"",
                     ""type"": ""Button"",
                     ""id"": ""a58d3ea1-9f13-43f3-88f4-e3c44a8b26d1"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -193,12 +193,23 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""e76a10b9-b656-4a87-bc65-c06d1ca98620"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""3a65b332-e691-4e27-9360-9b6baddc6c04"",
                     ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""PrimaryFire"",
+                    ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -209,7 +220,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""PrimaryFire"",
+                    ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -220,7 +231,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""SecondaryFire"",
+                    ""action"": ""LockOn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -231,42 +242,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""SecondaryFire"",
+                    ""action"": ""LockOn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""ScrollWheel"",
-                    ""id"": ""6aac8203-5e97-48fa-b6d1-80f3af43610e"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""StrafeY"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""4404d474-5bce-4620-a562-f5d3675a760d"",
-                    ""path"": ""<Mouse>/scroll/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""StrafeY"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""fd2e635d-710e-4a1f-a975-0a916ca33f64"",
-                    ""path"": ""<Mouse>/scroll/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""StrafeY"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
                 },
                 {
                     ""name"": ""Gamepad"",
@@ -355,6 +333,17 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Dash"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""44057831-68e2-45ff-8ae3-09bd50b89cfd"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Dash"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -367,8 +356,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_StrafeY = m_Player.FindAction("StrafeY", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
-        m_Player_PrimaryFire = m_Player.FindAction("PrimaryFire", throwIfNotFound: true);
-        m_Player_SecondaryFire = m_Player.FindAction("SecondaryFire", throwIfNotFound: true);
+        m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
+        m_Player_LockOn = m_Player.FindAction("LockOn", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
     }
 
@@ -440,8 +429,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_StrafeY;
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Pause;
-    private readonly InputAction m_Player_PrimaryFire;
-    private readonly InputAction m_Player_SecondaryFire;
+    private readonly InputAction m_Player_Fire;
+    private readonly InputAction m_Player_LockOn;
     private readonly InputAction m_Player_Dash;
     public struct PlayerActions
     {
@@ -451,8 +440,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @StrafeY => m_Wrapper.m_Player_StrafeY;
         public InputAction @Look => m_Wrapper.m_Player_Look;
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
-        public InputAction @PrimaryFire => m_Wrapper.m_Player_PrimaryFire;
-        public InputAction @SecondaryFire => m_Wrapper.m_Player_SecondaryFire;
+        public InputAction @Fire => m_Wrapper.m_Player_Fire;
+        public InputAction @LockOn => m_Wrapper.m_Player_LockOn;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
@@ -475,12 +464,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
-            @PrimaryFire.started += instance.OnPrimaryFire;
-            @PrimaryFire.performed += instance.OnPrimaryFire;
-            @PrimaryFire.canceled += instance.OnPrimaryFire;
-            @SecondaryFire.started += instance.OnSecondaryFire;
-            @SecondaryFire.performed += instance.OnSecondaryFire;
-            @SecondaryFire.canceled += instance.OnSecondaryFire;
+            @Fire.started += instance.OnFire;
+            @Fire.performed += instance.OnFire;
+            @Fire.canceled += instance.OnFire;
+            @LockOn.started += instance.OnLockOn;
+            @LockOn.performed += instance.OnLockOn;
+            @LockOn.canceled += instance.OnLockOn;
             @Dash.started += instance.OnDash;
             @Dash.performed += instance.OnDash;
             @Dash.canceled += instance.OnDash;
@@ -500,12 +489,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
-            @PrimaryFire.started -= instance.OnPrimaryFire;
-            @PrimaryFire.performed -= instance.OnPrimaryFire;
-            @PrimaryFire.canceled -= instance.OnPrimaryFire;
-            @SecondaryFire.started -= instance.OnSecondaryFire;
-            @SecondaryFire.performed -= instance.OnSecondaryFire;
-            @SecondaryFire.canceled -= instance.OnSecondaryFire;
+            @Fire.started -= instance.OnFire;
+            @Fire.performed -= instance.OnFire;
+            @Fire.canceled -= instance.OnFire;
+            @LockOn.started -= instance.OnLockOn;
+            @LockOn.performed -= instance.OnLockOn;
+            @LockOn.canceled -= instance.OnLockOn;
             @Dash.started -= instance.OnDash;
             @Dash.performed -= instance.OnDash;
             @Dash.canceled -= instance.OnDash;
@@ -532,8 +521,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnStrafeY(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
-        void OnPrimaryFire(InputAction.CallbackContext context);
-        void OnSecondaryFire(InputAction.CallbackContext context);
+        void OnFire(InputAction.CallbackContext context);
+        void OnLockOn(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
     }
 }

@@ -43,8 +43,7 @@ public class FirstPersonPlayer : MonoBehaviour
 
         actions.Dash.performed += Dash_performed;
         actions.Dash.canceled += Dash_canceled;
-        actions.PrimaryFire.performed += PrimaryFire_performed;
-        actions.SecondaryFire.performed += SecondaryFire_performed;
+        actions.Fire.performed += Fire_performed;
     }
     
     void Update()
@@ -53,7 +52,7 @@ public class FirstPersonPlayer : MonoBehaviour
         Movement();
     }
 
-    private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void Fire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         Vector3 shootPoint = camera.transform.position + shootOffset;
         GameObject p = bulletPool.Spawn(shootPoint);
@@ -67,11 +66,6 @@ public class FirstPersonPlayer : MonoBehaviour
         {
             p.GetComponent<Bullet>().direction = camera.transform.forward;
         }
-    }
-
-    private void SecondaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-
     }
 
     void Dash_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)

@@ -1,11 +1,13 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Galaxy : MonoBehaviour
 {
     public string seed = "";
-    [Min(1)] public Vector2Int size = Vector2Int.one;
-    [Min(1)] public static float qaudrantSize = 250;
+    public Vector2Int size = Vector2Int.one * 10;
+    
+    public static float qaudrantSize = 300;
     public static Noise noise;
 
     [SerializeField] Transform player;
@@ -19,8 +21,14 @@ public class Galaxy : MonoBehaviour
     void Awake()
     {
         quadrants = new List<GameObject>();
+
+        if(seed == "")
+        {
+            seed = DateTime.Now.ToString();
+        }
+        UnityEngine.Random.InitState(seed.GetHashCode());
         noise = new Noise(seed.GetHashCode());
-        Random.InitState(seed.GetHashCode());
+
 
         spaceColor = Util.RandomColor();
         RenderSettings.skybox.SetColor("_Tint", spaceColor);
@@ -29,7 +37,7 @@ public class Galaxy : MonoBehaviour
         {
             for (int z = -size.y/2; z < size.y; z++) 
             {
-                int i = Random.Range(0, 4);
+                int i = UnityEngine.Random.Range(0, 4);
                 // 0 == nothing
                 // 1 == asteroid field
                 // 2 == planet
@@ -59,6 +67,7 @@ public class Galaxy : MonoBehaviour
                         float y = noise.Evaluate(new Vector3(x, 0, z));
                         Vector3 pos = new Vector3(x, y, z) * qaudrantSize;
                         GameObject obj = Instantiate(planetPrefab, pos, Quaternion.identity, transform);
+                        obj.GetComponent<MeshRenderer>().material.color = Util.RandomColor();
                         quadrants.Add(obj);
                     } 
                 }

@@ -14,7 +14,7 @@ public class AsteroidField : MonoBehaviour
         {
             Vector3 pos = Random.insideUnitSphere * Galaxy.qaudrantSize;
             Quaternion rot = Random.rotation;
-            Vector3 scale = Vector3.one * Random.Range(1.0f, 5.0f);
+            Vector3 scale = Vector3.one * Random.Range(5.0f, 10.0f);
 
             int a = Random.Range(0, asteroidPrefabs.Length);
             GameObject obj = Instantiate(asteroidPrefabs[a], transform);

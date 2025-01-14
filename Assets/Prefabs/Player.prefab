@@ -386,7 +386,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5bb9b341402e83418a5566f7e609cda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  normalSpeed: 15
-  dashSpeed: 50
+  normalSpeed: 25
+  dashSpeed: 100
   lookSpeed: 100
-  shootOffset: {x: 0, y: -0.1, z: 0.1}
+  shootOffset: {x: 0, y: -0.1, z: 0}
