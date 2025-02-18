@@ -1,102 +1,151 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FirstPersonPlayer : MonoBehaviour
 {
-
-
-    
     // For Input
     Controls controls;
-    public Controls.PlayerActions actions;
+    Controls.PlayerActions actions;
 
     //Components
-    Camera camera;
-    CharacterController controller;
-    ObjectPool bulletPool;
+    [SerializeField] CharacterController controller;
+    [SerializeField] Animator animator;
+    [SerializeField] Transform body;
+    [SerializeField] Transform head;
+    [SerializeField] Transform arm;
+    [SerializeField] Image reticle;
 
     // For basic motion
     Vector3 moveDirection;
-    float speed;
-    [SerializeField] float normalSpeed = 15;
-    [SerializeField] float dashSpeed = 50;
+    Vector3 velocity = Vector3.zero;
+    float moveSpeed;
+    [SerializeField] float normalSpeed = 25;
+    [SerializeField] float boostSpeed = 100;
 
     //For Look/Aim
     [SerializeField] float lookSpeed = 100;
     float xRot = 0;
     float yRot = 0;
 
-    //For Shooting
-    [SerializeField] Vector3 shootOffset = new Vector3(0, -0.1f, 0.1f);
+    //For Combat
+    public PlayerWeapon currentWeapon;
 
-
-    void Awake()
+    void Start()
     {
-        speed = normalSpeed;
-        controller = GetComponent<CharacterController>();
-        camera = Camera.main;
-        bulletPool = GameObject.Find("BulletPool").GetComponent<ObjectPool>();
+        moveSpeed = normalSpeed;
+        if(!controller) controller = GetComponent<CharacterController>();
+        if(!animator) animator = GetComponent<Animator>();
 
         Cursor.lockState = CursorLockMode.Locked;
         controls = new Controls();
         actions = controls.Player;
         actions.Enable();
 
+        actions.PrimaryFire.performed += PrimaryFire_performed;
+        actions.PrimaryFire.canceled += PrimaryFire_canceled;
+        actions.SecondaryFire.performed += SecondaryFire_performed;
+        actions.SecondaryFire.canceled += SecondaryFire_canceled;
         actions.Dash.performed += Dash_performed;
         actions.Dash.canceled += Dash_canceled;
-        actions.Fire.performed += Fire_performed;
     }
     
     void Update()
     {
         Look();
         Movement();
+
+        if(currentWeapon.type == PlayerWeapon.WeaponType.SLASHING && actions.PrimaryFire.IsPressed())
+        {
+            Vector2 swingVector = actions.Look.ReadValue<Vector2>();
+            if(swingVector.magnitude > 0)
+            {
+                currentWeapon.swingAngle = Mathf.Atan2(swingVector.x, -swingVector.y) * Mathf.Rad2Deg;
+            }
+            else
+            {
+                currentWeapon.swingAngle = Random.Range(-180f, 180f);
+            }
+        }
+
     }
 
-    private void Fire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    void OnDestroy()
     {
-        Vector3 shootPoint = camera.transform.position + shootOffset;
-        GameObject p = bulletPool.Spawn(shootPoint);
-        p.GetComponent<Bullet>().owner = gameObject;
+        actions.PrimaryFire.performed -= PrimaryFire_performed;
+        actions.PrimaryFire.canceled -= PrimaryFire_canceled;
+        actions.SecondaryFire.performed -= SecondaryFire_performed;
+        actions.SecondaryFire.canceled -= SecondaryFire_canceled;
+        actions.Dash.performed -= Dash_performed;
+        actions.Dash.canceled -= Dash_canceled;
+    }
 
-        if (Physics.Raycast(shootPoint, camera.transform.forward, out RaycastHit hit ,camera.farClipPlane))
+    private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if(currentWeapon.type == PlayerWeapon.WeaponType.SLASHING)
         {
-            p.GetComponent<Bullet>().direction = (hit.point - shootPoint).normalized;
+            animator.SetTrigger("slash");
         }
-        else
+        else if(currentWeapon.type == PlayerWeapon.WeaponType.THRUSTING)
         {
-            p.GetComponent<Bullet>().direction = camera.transform.forward;
+
+        }
+        else if(currentWeapon.type == PlayerWeapon.WeaponType.SHOOTING)
+        {
+
         }
     }
 
-    void Dash_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void PrimaryFire_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        speed = dashSpeed;
+        
+    }
+
+    private void SecondaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        
+    }
+
+    private void SecondaryFire_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        
+    }
+
+    private void Dash_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        moveSpeed = boostSpeed;
     }
 
     private void Dash_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        speed = normalSpeed;
+        moveSpeed = normalSpeed;
     }
 
-    void Movement()
+    private void Movement()
     {
-
         //Basic Motion
         float x = actions.Move.ReadValue<Vector2>().x;
-        float y = actions.StrafeY.ReadValue<float>();
+        float y = actions.VerticalStrafe.ReadValue<float>();
         float z = actions.Move.ReadValue<Vector2>().y;
 
-        //Move Normally
-        moveDirection = camera.transform.right * x + camera.transform.forward * z + camera.transform.up * y;
-        controller.Move(moveDirection * speed * Time.deltaTime);
+        moveDirection = (head.transform.right * x + head.transform.forward * z + head.transform.up * y).normalized;
         
+        if(moveDirection.magnitude > 0)
+        {
+            velocity = moveDirection * moveSpeed * Time.deltaTime;
+        }
+        else
+        {
+            velocity = Vector3.Lerp(velocity, Vector3.zero, 6 * Time.deltaTime);
+        }
+        
+        controller.Move(velocity);
     }
 
-    void Look()
+    private void Look()
     {
         float x = actions.Look.ReadValue<Vector2>().x;
         float y = actions.Look.ReadValue<Vector2>().y;
-
+        
         //Looking up/down
         xRot -= y * lookSpeed * Time.deltaTime;
         xRot = Mathf.Clamp(xRot, -90, 90);
@@ -104,10 +153,22 @@ public class FirstPersonPlayer : MonoBehaviour
         //Looking left/right
         yRot += x * lookSpeed * Time.deltaTime;
 
-        transform.localEulerAngles = new Vector3(0, yRot, 0);
-        camera.transform.localEulerAngles = new Vector3(xRot, 0, 0);
-
+        body.localRotation = Quaternion.Euler(0, yRot, 0);
+        head.localRotation = Quaternion.Euler(xRot, 0, 0);
     }
 
+
+    //Animation Events
+    public void StartSlash()
+    {
+        currentWeapon.swinging = true;
+        arm.localEulerAngles = new Vector3(0, 0, currentWeapon.swingAngle);
+    }
+
+    public void EndSlash()
+    {
+        currentWeapon.swinging = false;
+        arm.localEulerAngles = Vector3.zero;
+    }
 
 }

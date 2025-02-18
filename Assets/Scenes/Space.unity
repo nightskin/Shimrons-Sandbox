@@ -319,55 +319,11 @@ MonoBehaviour:
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6
---- !u!1 &1147726972
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1147726974}
-  - component: {fileID: 1147726973}
-  m_Layer: 0
-  m_Name: Global Volume
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
---- !u!114 &1147726973
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1147726972}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  priority: 0
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: 056f3958f703e4a4fb7403e5e012e65c, type: 2}
---- !u!4 &1147726974
+--- !u!4 &961999474 stripped
 Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
+  m_PrefabInstance: {fileID: 3404248398127222696}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1147726972}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1148817304
 GameObject:
   m_ObjectHideFlags: 0
@@ -378,6 +334,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1148817305}
   - component: {fileID: 1148817306}
+  - component: {fileID: 1148817307}
   m_Layer: 0
   m_Name: Galaxy
   m_TagString: Untagged
@@ -412,18 +369,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16c173417651cdb43bc8dc65463804c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: dickButt
+  seed: pee
   size: {x: 10, y: 10}
-  player: {fileID: 1222990315}
+  player: {fileID: 961999474}
   spaceColor: {r: 0, g: 0, b: 0, a: 1}
   asteroidFieldPrefab: {fileID: 6334095533317573180, guid: 6025d735332358646bbffbebfa362252, type: 3}
   planetPrefab: {fileID: 7424151191006553150, guid: 2248e2d0c0a91b945b9a2d26bb099afb, type: 3}
   enemyFleatPrefab: {fileID: 0}
---- !u!4 &1222990315 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
-  m_PrefabInstance: {fileID: 6322392590281455843}
+--- !u!114 &1148817307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1148817304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 056f3958f703e4a4fb7403e5e012e65c, type: 2}
 --- !u!1 &1558440089
 GameObject:
   m_ObjectHideFlags: 0
@@ -470,7 +439,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obj: {fileID: 2473978273754124844, guid: fbe97424fa3260f4ca687bc5b4ee2a48, type: 3}
   count: 100
---- !u!1001 &6322392590281455843
+--- !u!1001 &3404248398127222696
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -532,8 +501,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
-  - {fileID: 1147726974}
   - {fileID: 755623140}
-  - {fileID: 6322392590281455843}
   - {fileID: 1148817305}
   - {fileID: 1558440090}
+  - {fileID: 3404248398127222696}
