@@ -6,10 +6,10 @@ public class PlayerWeapon : MonoBehaviour
     {
         SHOOTING,
         SLASHING,
-        THRUSTING
+        THRUSTING,
     }
 
-    public WeaponType type;
+    public WeaponType function;
     public int damage = 1;
 
 

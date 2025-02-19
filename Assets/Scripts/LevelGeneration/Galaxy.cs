@@ -11,7 +11,6 @@ public class Galaxy : MonoBehaviour
     public static Noise noise;
 
     [SerializeField] Transform player;
-    [SerializeField] Color spaceColor = Color.white;
     [SerializeField] GameObject asteroidFieldPrefab;
     [SerializeField] GameObject planetPrefab;
     [SerializeField] GameObject enemyFleatPrefab;
@@ -29,9 +28,6 @@ public class Galaxy : MonoBehaviour
         UnityEngine.Random.InitState(seed.GetHashCode());
         noise = new Noise(seed.GetHashCode());
 
-
-        spaceColor = Util.RandomColor();
-        RenderSettings.skybox.SetColor("_Tint", spaceColor);
 
         for (int x = -size.x/2; x < size.x/2; x++) 
         {

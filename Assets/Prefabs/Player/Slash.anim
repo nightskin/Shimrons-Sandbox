@@ -374,7 +374,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Body/Head/Arm/Rig/Bicep/Forearm/Wrist
+    path: Body/Head/Arm/Rig/Bicep
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -386,7 +386,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Body/Head/Arm/Rig/Bicep/Forearm/Wrist
+    path: Body/Head/Arm/Rig/Bicep
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -398,7 +398,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Body/Head/Arm/Rig/Bicep/Forearm/Wrist
+    path: Body/Head/Arm/Rig/Bicep
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -446,7 +446,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.x
-    path: Body/Head/Arm/Rig/Bicep
+    path: Body/Head/Arm/Rig/Bicep/Forearm/Wrist
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -458,7 +458,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: Body/Head/Arm/Rig/Bicep
+    path: Body/Head/Arm/Rig/Bicep/Forearm/Wrist
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -470,7 +470,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.z
-    path: Body/Head/Arm/Rig/Bicep
+    path: Body/Head/Arm/Rig/Bicep/Forearm/Wrist
     classID: 4
     script: {fileID: 0}
     flags: 0

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 
 public class FirstPersonPlayer : MonoBehaviour
 {
@@ -28,7 +30,25 @@ public class FirstPersonPlayer : MonoBehaviour
     float yRot = 0;
 
     //For Combat
-    public PlayerWeapon currentWeapon;
+    public List<PlayerWeapon> inventory;
+    int inventoryIndex = 0;
+
+    void Awake()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+
+        controls = new Controls();
+        actions = controls.Player;
+        actions.Enable();
+
+        actions.Attack.performed += Attack_performed;
+        actions.Attack.canceled += Attack_canceled;
+        actions.Defend.performed += Defend_performed;
+        actions.Defend.canceled += Defend_canceled;
+        actions.Dash.performed += Dash_performed;
+        actions.Dash.canceled += Dash_canceled;
+        actions.ToggleWeapons.performed += ToggleWeapons_performed;
+    }
 
     void Start()
     {
@@ -36,76 +56,80 @@ public class FirstPersonPlayer : MonoBehaviour
         if(!controller) controller = GetComponent<CharacterController>();
         if(!animator) animator = GetComponent<Animator>();
 
-        Cursor.lockState = CursorLockMode.Locked;
-        controls = new Controls();
-        actions = controls.Player;
-        actions.Enable();
 
-        actions.PrimaryFire.performed += PrimaryFire_performed;
-        actions.PrimaryFire.canceled += PrimaryFire_canceled;
-        actions.SecondaryFire.performed += SecondaryFire_performed;
-        actions.SecondaryFire.canceled += SecondaryFire_canceled;
-        actions.Dash.performed += Dash_performed;
-        actions.Dash.canceled += Dash_canceled;
     }
     
     void Update()
     {
         Look();
-        Movement();
-
-        if(currentWeapon.type == PlayerWeapon.WeaponType.SLASHING && actions.PrimaryFire.IsPressed())
-        {
-            Vector2 swingVector = actions.Look.ReadValue<Vector2>();
-            if(swingVector.magnitude > 0)
-            {
-                currentWeapon.swingAngle = Mathf.Atan2(swingVector.x, -swingVector.y) * Mathf.Rad2Deg;
-            }
-            else
-            {
-                currentWeapon.swingAngle = Random.Range(-180f, 180f);
-            }
-        }
-
+        Move();
+        Fight();
     }
 
     void OnDestroy()
     {
-        actions.PrimaryFire.performed -= PrimaryFire_performed;
-        actions.PrimaryFire.canceled -= PrimaryFire_canceled;
-        actions.SecondaryFire.performed -= SecondaryFire_performed;
-        actions.SecondaryFire.canceled -= SecondaryFire_canceled;
+        actions.Attack.performed -= Attack_performed;
+        actions.Attack.canceled -= Attack_canceled;
+        actions.Defend.performed -= Defend_performed;
+        actions.Defend.canceled -= Defend_canceled;
         actions.Dash.performed -= Dash_performed;
         actions.Dash.canceled -= Dash_canceled;
+        actions.ToggleWeapons.performed -= ToggleWeapons_performed;
     }
 
-    private void PrimaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void ToggleWeapons_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if(currentWeapon.type == PlayerWeapon.WeaponType.SLASHING)
+        if(obj.ReadValue<float>() > 0)
+        {
+            if (inventoryIndex < inventory.Count - 1)
+            {
+                inventoryIndex++;
+            }
+            else
+            {
+                inventoryIndex = 0;
+            }
+        }
+        else if(obj.ReadValue<float>() < 0)
+        {
+            if(inventoryIndex > 0)
+            {
+                inventoryIndex--;
+            }
+            else 
+            {
+                inventoryIndex = inventory.Count - 1;
+            }
+        }
+    }
+
+    private void Attack_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (inventory[inventoryIndex].function == PlayerWeapon.WeaponType.SLASHING)
         {
             animator.SetTrigger("slash");
         }
-        else if(currentWeapon.type == PlayerWeapon.WeaponType.THRUSTING)
+        else if (inventory[inventoryIndex].function == PlayerWeapon.WeaponType.THRUSTING)
         {
 
         }
-        else if(currentWeapon.type == PlayerWeapon.WeaponType.SHOOTING)
+        else if (inventory[inventoryIndex].function == PlayerWeapon.WeaponType.SHOOTING)
         {
 
         }
     }
 
-    private void PrimaryFire_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void Attack_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         
     }
 
-    private void SecondaryFire_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void Defend_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         
     }
 
-    private void SecondaryFire_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void Defend_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
         
     }
@@ -120,7 +144,28 @@ public class FirstPersonPlayer : MonoBehaviour
         moveSpeed = normalSpeed;
     }
 
-    private void Movement()
+    private void Fight()
+    {
+        if (inventory[inventoryIndex].function == PlayerWeapon.WeaponType.SLASHING)
+        {
+            if (actions.Attack.IsPressed())
+            {
+                Vector2 swingVector = actions.Look.ReadValue<Vector2>();
+                if (swingVector.magnitude > 0)
+                {
+                    inventory[inventoryIndex].swingAngle = Mathf.Atan2(swingVector.x, -swingVector.y) * Mathf.Rad2Deg;
+                }
+                else
+                {
+                    inventory[inventoryIndex].swingAngle = Random.Range(0f, 360f);
+                }
+            }
+        }
+
+
+    }
+
+    private void Move()
     {
         //Basic Motion
         float x = actions.Move.ReadValue<Vector2>().x;
@@ -161,13 +206,13 @@ public class FirstPersonPlayer : MonoBehaviour
     //Animation Events
     public void StartSlash()
     {
-        currentWeapon.swinging = true;
-        arm.localEulerAngles = new Vector3(0, 0, currentWeapon.swingAngle);
+        inventory[inventoryIndex].swinging = true;
+        arm.localEulerAngles = new Vector3(0, 0, inventory[inventoryIndex].swingAngle);
     }
 
     public void EndSlash()
     {
-        currentWeapon.swinging = false;
+        inventory[inventoryIndex].swinging = false;
         arm.localEulerAngles = Vector3.zero;
     }
 
