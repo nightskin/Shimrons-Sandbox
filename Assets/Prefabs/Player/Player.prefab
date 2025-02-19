@@ -580,7 +580,7 @@ GameObject:
   - component: {fileID: 4410459361712695398}
   - component: {fileID: 673401835101703834}
   - component: {fileID: 2042826324604438032}
-  - component: {fileID: 1172152244953580822}
+  - component: {fileID: 1449550538365198057}
   m_Layer: 3
   m_Name: PlasmaCutter
   m_TagString: Weapon
@@ -654,7 +654,7 @@ CapsuleCollider:
   m_Height: 7.25
   m_Direction: 1
   m_Center: {x: 0.000000013073409, y: 2.6113017, z: 0.00000001670698}
---- !u!114 &1172152244953580822
+--- !u!114 &1449550538365198057
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -663,13 +663,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2766836234729003302}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e69fa581c78f3847b2c7b45ee98bf89, type: 3}
+  m_Script: {fileID: 11500000, guid: 4edfc605615960741af3cf52ce68e4c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  function: 1
+  slashing: 0
+  thrusting: 0
+  throwing: 0
+  shooting: 0
   damage: 1
-  swinging: 0
-  swingAngle: 180
 --- !u!1 &2796075515183512609
 GameObject:
   m_ObjectHideFlags: 0
@@ -1300,7 +1301,7 @@ MonoBehaviour:
   boostSpeed: 100
   lookSpeed: 100
   inventory:
-  - {fileID: 1172152244953580822}
+  - {fileID: 1449550538365198057}
 --- !u!95 &7948325728549469981
 Animator:
   serializedVersion: 7

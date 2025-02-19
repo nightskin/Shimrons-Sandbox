@@ -64,7 +64,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Attack"",
+                    ""name"": ""Use1"",
                     ""type"": ""Button"",
                     ""id"": ""96cd0cc9-4fe8-4689-9a94-df33aeb923a8"",
                     ""expectedControlType"": """",
@@ -73,7 +73,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Defend"",
+                    ""name"": ""Use2"",
                     ""type"": ""Button"",
                     ""id"": ""6449aa72-1b91-413f-b190-91bed85bfee4"",
                     ""expectedControlType"": """",
@@ -273,7 +273,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""Attack"",
+                    ""action"": ""Use1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -284,18 +284,18 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
-                    ""action"": ""Attack"",
+                    ""action"": ""Use1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""0fb9896d-9813-4e37-9afe-a605106dc850"",
-                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""Defend"",
+                    ""action"": ""Use2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -306,7 +306,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
-                    ""action"": ""Defend"",
+                    ""action"": ""Use2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -519,8 +519,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_VerticalStrafe = m_Player.FindAction("VerticalStrafe", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
-        m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
-        m_Player_Defend = m_Player.FindAction("Defend", throwIfNotFound: true);
+        m_Player_Use1 = m_Player.FindAction("Use1", throwIfNotFound: true);
+        m_Player_Use2 = m_Player.FindAction("Use2", throwIfNotFound: true);
         m_Player_ToggleWeapons = m_Player.FindAction("ToggleWeapons", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
     }
@@ -593,8 +593,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_VerticalStrafe;
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Pause;
-    private readonly InputAction m_Player_Attack;
-    private readonly InputAction m_Player_Defend;
+    private readonly InputAction m_Player_Use1;
+    private readonly InputAction m_Player_Use2;
     private readonly InputAction m_Player_ToggleWeapons;
     private readonly InputAction m_Player_Dash;
     public struct PlayerActions
@@ -605,8 +605,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         public InputAction @VerticalStrafe => m_Wrapper.m_Player_VerticalStrafe;
         public InputAction @Look => m_Wrapper.m_Player_Look;
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
-        public InputAction @Attack => m_Wrapper.m_Player_Attack;
-        public InputAction @Defend => m_Wrapper.m_Player_Defend;
+        public InputAction @Use1 => m_Wrapper.m_Player_Use1;
+        public InputAction @Use2 => m_Wrapper.m_Player_Use2;
         public InputAction @ToggleWeapons => m_Wrapper.m_Player_ToggleWeapons;
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -630,12 +630,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
-            @Attack.started += instance.OnAttack;
-            @Attack.performed += instance.OnAttack;
-            @Attack.canceled += instance.OnAttack;
-            @Defend.started += instance.OnDefend;
-            @Defend.performed += instance.OnDefend;
-            @Defend.canceled += instance.OnDefend;
+            @Use1.started += instance.OnUse1;
+            @Use1.performed += instance.OnUse1;
+            @Use1.canceled += instance.OnUse1;
+            @Use2.started += instance.OnUse2;
+            @Use2.performed += instance.OnUse2;
+            @Use2.canceled += instance.OnUse2;
             @ToggleWeapons.started += instance.OnToggleWeapons;
             @ToggleWeapons.performed += instance.OnToggleWeapons;
             @ToggleWeapons.canceled += instance.OnToggleWeapons;
@@ -658,12 +658,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
-            @Attack.started -= instance.OnAttack;
-            @Attack.performed -= instance.OnAttack;
-            @Attack.canceled -= instance.OnAttack;
-            @Defend.started -= instance.OnDefend;
-            @Defend.performed -= instance.OnDefend;
-            @Defend.canceled -= instance.OnDefend;
+            @Use1.started -= instance.OnUse1;
+            @Use1.performed -= instance.OnUse1;
+            @Use1.canceled -= instance.OnUse1;
+            @Use2.started -= instance.OnUse2;
+            @Use2.performed -= instance.OnUse2;
+            @Use2.canceled -= instance.OnUse2;
             @ToggleWeapons.started -= instance.OnToggleWeapons;
             @ToggleWeapons.performed -= instance.OnToggleWeapons;
             @ToggleWeapons.canceled -= instance.OnToggleWeapons;
@@ -711,8 +711,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         void OnVerticalStrafe(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnPause(InputAction.CallbackContext context);
-        void OnAttack(InputAction.CallbackContext context);
-        void OnDefend(InputAction.CallbackContext context);
+        void OnUse1(InputAction.CallbackContext context);
+        void OnUse2(InputAction.CallbackContext context);
         void OnToggleWeapons(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
     }

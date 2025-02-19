@@ -42,7 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Attack",
+                    "name": "Use1",
                     "type": "Button",
                     "id": "96cd0cc9-4fe8-4689-9a94-df33aeb923a8",
                     "expectedControlType": "",
@@ -51,7 +51,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Defend",
+                    "name": "Use2",
                     "type": "Button",
                     "id": "6449aa72-1b91-413f-b190-91bed85bfee4",
                     "expectedControlType": "",
@@ -251,7 +251,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Attack",
+                    "action": "Use1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -262,18 +262,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
-                    "action": "Attack",
+                    "action": "Use1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "0fb9896d-9813-4e37-9afe-a605106dc850",
-                    "path": "<Gamepad>/leftShoulder",
+                    "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Defend",
+                    "action": "Use2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -284,7 +284,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
-                    "action": "Defend",
+                    "action": "Use2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

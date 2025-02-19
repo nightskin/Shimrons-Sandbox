@@ -43,10 +43,8 @@ public class FirstPersonPlayer : MonoBehaviour
         actions = controls.Player;
         actions.Enable();
 
-        actions.Attack.performed += Attack_performed;
-        actions.Attack.canceled += Attack_canceled;
-        actions.Defend.performed += Defend_performed;
-        actions.Defend.canceled += Defend_canceled;
+        actions.Use1.performed += Use1_performed;
+        actions.Use2.performed += Use2_performed;
         actions.Dash.performed += Dash_performed;
         actions.Dash.canceled += Dash_canceled;
         actions.ToggleWeapons.performed += ToggleWeapons_performed;
@@ -57,8 +55,6 @@ public class FirstPersonPlayer : MonoBehaviour
         moveSpeed = normalSpeed;
         if(!controller) controller = GetComponent<CharacterController>();
         if(!animator) animator = GetComponent<Animator>();
-
-
     }
     
     void Update()
@@ -70,10 +66,8 @@ public class FirstPersonPlayer : MonoBehaviour
 
     void OnDestroy()
     {
-        actions.Attack.performed -= Attack_performed;
-        actions.Attack.canceled -= Attack_canceled;
-        actions.Defend.performed -= Defend_performed;
-        actions.Defend.canceled -= Defend_canceled;
+        actions.Use1.performed -= Use1_performed;
+        actions.Use2.performed -= Use2_performed;
         actions.Dash.performed -= Dash_performed;
         actions.Dash.canceled -= Dash_canceled;
         actions.ToggleWeapons.performed -= ToggleWeapons_performed;
@@ -105,35 +99,20 @@ public class FirstPersonPlayer : MonoBehaviour
         }
     }
 
-    private void Attack_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void Use1_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if (inventory[selected].function == PlayerWeapon.WeaponType.SLASHING)
+        if (inventory[selected] is PlayerMeleeWeapon)
         {
             animator.SetTrigger("slash");
         }
-        else if (inventory[selected].function == PlayerWeapon.WeaponType.THRUSTING)
+    }
+
+    private void Use2_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        if (inventory[selected] is PlayerMeleeWeapon)
         {
-
+            animator.SetTrigger("slash");
         }
-        else if (inventory[selected].function == PlayerWeapon.WeaponType.SHOOTING)
-        {
-
-        }
-    }
-
-    private void Attack_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        
-    }
-
-    private void Defend_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        
-    }
-
-    private void Defend_canceled(UnityEngine.InputSystem.InputAction.CallbackContext obj)
-    {
-        
     }
 
     private void Dash_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -148,13 +127,10 @@ public class FirstPersonPlayer : MonoBehaviour
 
     private void Fight()
     {
-        if (inventory[selected].function == PlayerWeapon.WeaponType.SLASHING)
+        atkDirection = actions.Look.ReadValue<Vector2>().normalized;
+        if (atkDirection.magnitude > 0)
         {
-            atkDirection = actions.Look.ReadValue<Vector2>().normalized;
-            if (atkDirection.magnitude > 0)
-            {
-                atkAngle = Mathf.Atan2(atkDirection.x, -atkDirection.y) * Mathf.Rad2Deg;
-            }
+            atkAngle = Mathf.Atan2(atkDirection.x, -atkDirection.y) * Mathf.Rad2Deg;
         }
     }
 
@@ -204,13 +180,13 @@ public class FirstPersonPlayer : MonoBehaviour
             atkAngle = Random.Range(0f, 360f);
         }
 
-        inventory[selected].swinging = true;
+        inventory[selected].slashing = true;
         arm.localEulerAngles = new Vector3(0, 0, atkAngle);
     }
 
     public void EndSlash()
     {
-        inventory[selected].swinging = false;
+        inventory[selected].slashing = false;
         arm.localEulerAngles = Vector3.zero;
     }
 

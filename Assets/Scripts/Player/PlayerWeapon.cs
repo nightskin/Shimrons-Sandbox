@@ -2,25 +2,8 @@ using UnityEngine;
 
 public class PlayerWeapon : MonoBehaviour
 {
-    public enum WeaponType
-    {
-        SHOOTING,
-        SLASHING,
-        THRUSTING,
-    }
-
-    public WeaponType function;
-    public int damage = 1;
-
-
-    public bool swinging = false;
-
-    void OnTriggerEnter(Collider other)
-    {
-        if(swinging)
-        {
-            
-        }
-    }
-
+    public bool slashing = false;
+    public bool thrusting = false;
+    public bool throwing = false;
+    public bool shooting = false;
 }
