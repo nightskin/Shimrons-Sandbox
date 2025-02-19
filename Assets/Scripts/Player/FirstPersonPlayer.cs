@@ -19,7 +19,6 @@ public class FirstPersonPlayer : MonoBehaviour
 
     // For basic motion
     Vector3 moveDirection;
-    Vector3 velocity = Vector3.zero;
     float moveSpeed;
     [SerializeField] float normalSpeed = 25;
     [SerializeField] float boostSpeed = 100;
@@ -142,17 +141,7 @@ public class FirstPersonPlayer : MonoBehaviour
         float z = actions.Move.ReadValue<Vector2>().y;
 
         moveDirection = (head.transform.right * x + head.transform.forward * z + head.transform.up * y).normalized;
-        
-        if(moveDirection.magnitude > 0)
-        {
-            velocity = moveDirection * moveSpeed * Time.deltaTime;
-        }
-        else
-        {
-            velocity = Vector3.Lerp(velocity, Vector3.zero, 6 * Time.deltaTime);
-        }
-        
-        controller.Move(velocity);
+        controller.Move(moveDirection * moveSpeed * Time.deltaTime);
     }
 
     private void Look()
