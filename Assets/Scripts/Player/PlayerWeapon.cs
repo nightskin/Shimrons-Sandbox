@@ -14,7 +14,6 @@ public class PlayerWeapon : MonoBehaviour
 
 
     public bool swinging = false;
-    public float swingAngle = 180;
 
     void OnTriggerEnter(Collider other)
     {

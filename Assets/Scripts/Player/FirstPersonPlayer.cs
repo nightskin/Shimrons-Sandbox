@@ -30,8 +30,10 @@ public class FirstPersonPlayer : MonoBehaviour
     float yRot = 0;
 
     //For Combat
+    float atkAngle = 45;
+    Vector2 atkDirection = Vector2.zero;
     public List<PlayerWeapon> inventory;
-    int inventoryIndex = 0;
+    int selected = 0;
 
     void Awake()
     {
@@ -81,39 +83,39 @@ public class FirstPersonPlayer : MonoBehaviour
     {
         if(obj.ReadValue<float>() > 0)
         {
-            if (inventoryIndex < inventory.Count - 1)
+            if (selected < inventory.Count - 1)
             {
-                inventoryIndex++;
+                selected++;
             }
             else
             {
-                inventoryIndex = 0;
+                selected = 0;
             }
         }
         else if(obj.ReadValue<float>() < 0)
         {
-            if(inventoryIndex > 0)
+            if(selected > 0)
             {
-                inventoryIndex--;
+                selected--;
             }
             else 
             {
-                inventoryIndex = inventory.Count - 1;
+                selected = inventory.Count - 1;
             }
         }
     }
 
     private void Attack_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        if (inventory[inventoryIndex].function == PlayerWeapon.WeaponType.SLASHING)
+        if (inventory[selected].function == PlayerWeapon.WeaponType.SLASHING)
         {
             animator.SetTrigger("slash");
         }
-        else if (inventory[inventoryIndex].function == PlayerWeapon.WeaponType.THRUSTING)
+        else if (inventory[selected].function == PlayerWeapon.WeaponType.THRUSTING)
         {
 
         }
-        else if (inventory[inventoryIndex].function == PlayerWeapon.WeaponType.SHOOTING)
+        else if (inventory[selected].function == PlayerWeapon.WeaponType.SHOOTING)
         {
 
         }
@@ -146,23 +148,14 @@ public class FirstPersonPlayer : MonoBehaviour
 
     private void Fight()
     {
-        if (inventory[inventoryIndex].function == PlayerWeapon.WeaponType.SLASHING)
+        if (inventory[selected].function == PlayerWeapon.WeaponType.SLASHING)
         {
-            if (actions.Attack.IsPressed())
+            atkDirection = actions.Look.ReadValue<Vector2>().normalized;
+            if (atkDirection.magnitude > 0)
             {
-                Vector2 swingVector = actions.Look.ReadValue<Vector2>();
-                if (swingVector.magnitude > 0)
-                {
-                    inventory[inventoryIndex].swingAngle = Mathf.Atan2(swingVector.x, -swingVector.y) * Mathf.Rad2Deg;
-                }
-                else
-                {
-                    inventory[inventoryIndex].swingAngle = Random.Range(0f, 360f);
-                }
+                atkAngle = Mathf.Atan2(atkDirection.x, -atkDirection.y) * Mathf.Rad2Deg;
             }
         }
-
-
     }
 
     private void Move()
@@ -206,13 +199,18 @@ public class FirstPersonPlayer : MonoBehaviour
     //Animation Events
     public void StartSlash()
     {
-        inventory[inventoryIndex].swinging = true;
-        arm.localEulerAngles = new Vector3(0, 0, inventory[inventoryIndex].swingAngle);
+        if(atkDirection.magnitude == 0)
+        {
+            atkAngle = Random.Range(0f, 360f);
+        }
+
+        inventory[selected].swinging = true;
+        arm.localEulerAngles = new Vector3(0, 0, atkAngle);
     }
 
     public void EndSlash()
     {
-        inventory[inventoryIndex].swinging = false;
+        inventory[selected].swinging = false;
         arm.localEulerAngles = Vector3.zero;
     }
 
