@@ -64,48 +64,21 @@ public class Bullet : MonoBehaviour
         {
             if (Physics.Raycast(previousPosition, direction, out RaycastHit hit, distance))
             {
-                if (hit.transform.tag == "Asteroid")
-                {
-                    hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, blastRadius);
-                    gameObject.SetActive(false);
-                }
-                else if (hit.transform.tag == "Planet")
-                {
-                    hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, 1);
-                    gameObject.SetActive(false);
-                }
+                
             }
         }
         else if(shape == BulletShape.SPHERE) 
         {
             if (Physics.SphereCast(previousPosition, GetComponent<SphereCollider>().radius, direction, out RaycastHit hit, distance))
             {
-                if (hit.transform.tag == "Asteroid")
-                {
-                    hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, blastRadius);
-                    gameObject.SetActive(false);
-                }
-                else if (hit.transform.tag == "Planet")
-                {
-                    hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, 1);
-                    gameObject.SetActive(false);
-                }
+                
             }
         }
         else if(shape == BulletShape.BOX)
         {
             if (Physics.BoxCast(previousPosition, GetComponent<BoxCollider>().size, direction,out RaycastHit hit, transform.rotation ,distance))
             {
-                if (hit.transform.tag == "Asteroid")
-                {
-                    hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, blastRadius);
-                    gameObject.SetActive(false);
-                }
-                else if (hit.transform.tag == "Planet")
-                {
-                    hit.transform.GetComponent<Voxelizer>().Teraform(hit.point, 1);
-                    gameObject.SetActive(false);
-                }
+                
             }
         }
 

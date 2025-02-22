@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class PlayerWeapon : MonoBehaviour
 {
-    public bool slashing = false;
-    public bool thrusting = false;
-    public bool throwing = false;
-    public bool shooting = false;
+    [HideInInspector] public bool slashing = false;
+    [HideInInspector] public bool thrusting = false;
+    [HideInInspector] public bool throwing = false;
+    [HideInInspector] public bool shooting = false;
 }

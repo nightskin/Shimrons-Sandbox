@@ -5,8 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public struct Voxel
 {
-    public bool active;
+    public float value;
+    public Vector3Int index;
     public Vector3 position;
-    public int index;
 }
 
