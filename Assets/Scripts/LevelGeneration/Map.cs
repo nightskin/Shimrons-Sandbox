@@ -6,18 +6,16 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class Map : MonoBehaviour
 {
-    [SerializeField] bool showDebug = false;
     [SerializeField][Min(5)] int resolution = 50;
     [SerializeField][Min(0.01f)] float voxelSpacing = 50;
 
     [SerializeField] string seed;
-    [SerializeField][Range(-1, 1)] float isoLevel = 0;
-    [SerializeField] float outerRadius = 2000;
-    [SerializeField] float innerRadius = 250;
     [SerializeField] int steps = 100;
-    
-    
-    Voxel[,,] voxels = null;
+    [SerializeField] bool indoor = true;
+
+    float isoLevel = 0;
+
+    public static Voxel[,,] voxels = null;
     Mesh mesh;
     List<Vector3> verts = new List<Vector3>();
     List<Vector2> uvs = new List<Vector2>();
@@ -35,16 +33,6 @@ public class Map : MonoBehaviour
         GenerateMeshData();
     }
 
-    void OnDrawGizmos()
-    {
-        if(showDebug)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(transform.position, outerRadius);
-            Gizmos.DrawWireCube(transform.position, Vector3.one * (resolution * voxelSpacing));
-        }
-    }
-
     void GenerateVoxelData()
     {
         voxels = new Voxel[resolution + 1, resolution + 1, resolution + 1];
@@ -57,29 +45,26 @@ public class Map : MonoBehaviour
                     voxels[x, y, z] = new Voxel();
                     voxels[x, y, z].index = new Vector3Int(x, y, z);
                     voxels[x, y, z].position = new Vector3(x - (resolution + 1) / 2, y - (resolution + 1) / 2, z - (resolution + 1) / 2) * voxelSpacing;
-
-                    if (Vector3.Distance(voxels[x,y,z].position, Vector3.zero) > outerRadius || Vector3.Distance(voxels[x, y, z].position, Vector3.zero) < innerRadius)
-                    {
-                        voxels[x, y, z].value = -1;
-                    }
-                    else
-                    {
-                        voxels[x, y, z].value = 1;
-                    }
+                    if(indoor) voxels[x, y, z].value = 1;
+                    else voxels[x,y,z].value = -1;
                 }
             }
         }
 
-        Vector3Int current = new Vector3Int(resolution / 2, resolution, resolution / 2);
+        Vector3Int current = new Vector3Int(resolution / 2, resolution / 2, resolution / 2);
         for(int s = 0; s < steps; s++) 
         {
             ActivateBox(current, Vector3Int.one);
-            int d = Random.Range(0, 6);
-            if (d == 0) current += Vector3Int.forward;
-            if (d == 1) current += Vector3Int.back;
-            if (d == 2) current += Vector3Int.left;
-            if (d == 3) current += Vector3Int.right;
-            if (d == 4) current += Vector3Int.down;
+            int directionIndex = Random.Range(0, 6);
+            Vector3Int direction = Vector3Int.zero;
+            if (directionIndex == 0) direction = Vector3Int.forward;
+            if (directionIndex == 1) direction = Vector3Int.back;
+            if (directionIndex == 2) direction = Vector3Int.left;
+            if (directionIndex == 3) direction = Vector3Int.right;
+            if (directionIndex == 4) direction = Vector3Int.down;
+            if (directionIndex == 5) direction = Vector3Int.up;
+
+            current += direction;
         }
 
     }
@@ -149,7 +134,7 @@ public class Map : MonoBehaviour
     {
         if (voxels == null) return;
 
-        for(int x = -size.x; x < size.x; x++) 
+        for (int x = -size.x; x < size.x; x++)
         {
             for (int y = -size.y; y < size.y; y++)
             {
@@ -161,7 +146,8 @@ public class Map : MonoBehaviour
                         {
                             if (index.z + z > 0 && index.z + z < resolution)
                             {
-                                voxels[index.x + x, index.y + y, index.z + z].value = -1;
+                               if(indoor) voxels[index.x + x, index.y + y, index.z + z].value = -1;
+                               else voxels[index.x + x, index.y + y, index.z + z].value = 1;
                             }
                         }
                     }
@@ -169,9 +155,6 @@ public class Map : MonoBehaviour
             }
         }
 
-
-
-
-
     }
+
 }

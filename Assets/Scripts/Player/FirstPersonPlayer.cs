@@ -34,6 +34,9 @@ public class FirstPersonPlayer : MonoBehaviour
     public List<PlayerWeapon> inventory;
     int selected = 0;
 
+    //For Collision
+    CollisionFlags flags;
+
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -141,7 +144,7 @@ public class FirstPersonPlayer : MonoBehaviour
         float z = actions.Move.ReadValue<Vector2>().y;
 
         moveDirection = (head.transform.right * x + head.transform.forward * z + head.transform.up * y).normalized;
-        controller.Move(moveDirection * moveSpeed * Time.deltaTime);
+        flags = controller.Move(moveDirection * moveSpeed * Time.deltaTime);
     }
 
     private void Look()
