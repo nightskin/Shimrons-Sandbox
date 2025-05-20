@@ -33,9 +33,7 @@ public class FirstPersonPlayer : MonoBehaviour
     Vector2 atkDirection = Vector2.zero;
     public List<PlayerWeapon> inventory;
     int selected = 0;
-
-    //For Collision
-    CollisionFlags flags;
+    
 
     void Awake()
     {
@@ -144,7 +142,7 @@ public class FirstPersonPlayer : MonoBehaviour
         float z = actions.Move.ReadValue<Vector2>().y;
 
         moveDirection = (head.transform.right * x + head.transform.forward * z + head.transform.up * y).normalized;
-        flags = controller.Move(moveDirection * moveSpeed * Time.deltaTime);
+        controller.Move(moveDirection * moveSpeed * Time.deltaTime);
     }
 
     private void Look()

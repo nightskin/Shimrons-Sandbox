@@ -40,14 +40,14 @@ public class Util
     public static int GetState(Voxel[] points, float isoLevel)
     {
         int state = 0;
-        if (points[0].value > isoLevel) state |= 1;
-        if (points[1].value > isoLevel) state |= 2;
-        if (points[2].value > isoLevel) state |= 4;
-        if (points[3].value > isoLevel) state |= 8;
-        if (points[4].value > isoLevel) state |= 16;
-        if (points[5].value > isoLevel) state |= 32;
-        if (points[6].value > isoLevel) state |= 64;
-        if (points[7].value > isoLevel) state |= 128;
+        if (points[0].value >= isoLevel) state |= 1;
+        if (points[1].value >= isoLevel) state |= 2;
+        if (points[2].value >= isoLevel) state |= 4;
+        if (points[3].value >= isoLevel) state |= 8;
+        if (points[4].value >= isoLevel) state |= 16;
+        if (points[5].value >= isoLevel) state |= 32;
+        if (points[6].value >= isoLevel) state |= 64;
+        if (points[7].value >= isoLevel) state |= 128;
         return state;
     }
 
