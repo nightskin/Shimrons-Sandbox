@@ -36,7 +36,6 @@ public class Util
         return new Color(r, g, b, a);
     }
 
-
     public static int GetState(Voxel[] points, float isoLevel)
     {
         int state = 0;

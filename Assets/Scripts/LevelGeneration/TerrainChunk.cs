@@ -39,6 +39,12 @@ public class TerrainChunk : MonoBehaviour
                     voxels[x, y, z] = new Voxel();
                     voxels[x, y, z].position = new Vector3(x, y, z) * world.voxelSpacing;
                     voxels[x, y, z].value = world.EvaluateHeight(new Vector3(x, y, z) + offset);
+
+                    if (y < world.minHeight)
+                    {
+                        voxels[x, y, z].value -= world.MakeTunnels(new Vector3(x, y, z) + offset);
+                    }
+
                 }
             }
         }
@@ -104,5 +110,7 @@ public class TerrainChunk : MonoBehaviour
         mesh.RecalculateTangents();
         GetComponent<MeshCollider>().sharedMesh = mesh;
     }
+
+    
 
 }

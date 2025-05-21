@@ -386,7 +386,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 640
+      value: 160
       objectReference: {fileID: 0}
     - target: {fileID: 6322392591172081543, guid: 1c86d9c245f08d84aa54e8fd688f1c01, type: 3}
       propertyPath: m_LocalPosition.z
@@ -474,20 +474,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b257aa621759a0d48b3d1dd1de943495, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseRoughness: 1
-  roughness: 3
-  persistance: 0.5
-  layers: 3
-  seed: 
-  maxHeight: 64
-  minHeight: 10
   terrainChunkPrefab: {fileID: 1670142471836711785, guid: ae4ef3b547f617543ba67529c157bef1, type: 3}
   player: {fileID: 1573428774}
+  seed: 
   worldSizeInChunks: 1
+  maxHeight: 63
+  minHeight: 16
+  baseRoughness: 1
+  roughness: 3
+  persistance: 0.2
+  layers: 4
   voxelRes: 64
   voxelSpacing: 10
-  isoLevel: 0.5
-  noiseScale: 0.025
+  isoLevel: 0.25
+  noiseScale: 0.03
+  tunnelScale: 0.08
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
