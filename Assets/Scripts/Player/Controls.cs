@@ -119,6 +119,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""LookZ"",
+                    ""type"": ""Value"",
+                    ""id"": ""ee74b789-784a-4d19-8286-9dd220368039"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
                     ""name"": ""Pause"",
                     ""type"": ""Button"",
                     ""id"": ""99c1cc24-0fcf-43d4-971f-cee1a33f21e5"",
@@ -131,33 +140,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": ""Use1"",
                     ""type"": ""Button"",
                     ""id"": ""96cd0cc9-4fe8-4689-9a94-df33aeb923a8"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Use2"",
-                    ""type"": ""Button"",
-                    ""id"": ""6449aa72-1b91-413f-b190-91bed85bfee4"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ToggleWeapons"",
-                    ""type"": ""Value"",
-                    ""id"": ""1b6d6974-e85e-4985-bfb2-b13847cf2589"",
-                    ""expectedControlType"": ""Axis"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""Dash"",
-                    ""type"": ""Button"",
-                    ""id"": ""8fd49e88-220b-4192-949d-306a3a0c3686"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -353,94 +335,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""0fb9896d-9813-4e37-9afe-a605106dc850"",
-                    ""path"": ""<Gamepad>/rightShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Use2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""ecbb237e-8913-4bb6-98e2-8bed99b0bf5f"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""KeyboardMouse"",
-                    ""action"": ""Use2"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""Dpad"",
-                    ""id"": ""6607ecdb-cd68-471f-aa02-bc9b9dc66911"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ToggleWeapons"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""433dc7ea-39eb-48ed-bc81-9ce178de71a3"",
-                    ""path"": ""<Gamepad>/dpad/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""ToggleWeapons"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""c8bc72ef-32aa-45cd-ab43-8e6876d8cf71"",
-                    ""path"": ""<Gamepad>/dpad/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""ToggleWeapons"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""ScrollWheel"",
-                    ""id"": ""75ef534c-bce3-437c-954b-39f0f5a2cdf6"",
-                    ""path"": ""1DAxis"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""ToggleWeapons"",
-                    ""isComposite"": true,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": ""negative"",
-                    ""id"": ""6e90ab91-daa7-44ac-a027-6e10deb9e00c"",
-                    ""path"": ""<Mouse>/scroll/down"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";KeyboardMouse"",
-                    ""action"": ""ToggleWeapons"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""positive"",
-                    ""id"": ""8bdbc42e-1cd2-480c-863a-dc4011b907e9"",
-                    ""path"": ""<Mouse>/scroll/up"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";KeyboardMouse"",
-                    ""action"": ""ToggleWeapons"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
                     ""name"": ""Keyboard"",
                     ""id"": ""5ee30fdd-2f0e-4bd9-84c3-ae748ceeec0f"",
                     ""path"": ""1DAxis"",
@@ -507,48 +401,70 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""f88585cb-511d-400a-b6e0-8fc9844bf04e"",
-                    ""path"": ""<Keyboard>/shift"",
+                    ""name"": ""Keyboard"",
+                    ""id"": ""98180f97-43b2-43b7-89bb-79c348a3259e"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LookZ"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""7c307b19-bc4f-44f1-9a0c-4a474abf5bec"",
+                    ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KeyboardMouse"",
-                    ""action"": ""Dash"",
+                    ""action"": ""LookZ"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""196796ce-30f0-437e-93e1-d6765023c894"",
-                    ""path"": ""<Gamepad>/leftStickPress"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Gamepad"",
-                    ""action"": ""Dash"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""0034fbfe-7e8b-4d7e-a5fd-307cf14a6806"",
-                    ""path"": ""<Mouse>/middleButton"",
+                    ""name"": ""positive"",
+                    ""id"": ""a706cbd0-49dd-4740-b2c1-b9c8d2519f51"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KeyboardMouse"",
-                    ""action"": ""Dash"",
+                    ""action"": ""LookZ"",
                     ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Gamepad"",
+                    ""id"": ""ca701597-9dc6-4937-a5d4-8406b47f2b25"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LookZ"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""45e6f6b8-47ac-4d06-900d-48c63b96db6e"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""name"": ""negative"",
+                    ""id"": ""8b2a8fe6-2f24-4e38-aa11-04f8beea04d3"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""Dash"",
+                    ""action"": ""LookZ"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""3b4625f5-866d-4eb2-840a-5fa1019671e0"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""LookZ"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -582,11 +498,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_VerticalStrafe = m_Player.FindAction("VerticalStrafe", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
+        m_Player_LookZ = m_Player.FindAction("LookZ", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
         m_Player_Use1 = m_Player.FindAction("Use1", throwIfNotFound: true);
-        m_Player_Use2 = m_Player.FindAction("Use2", throwIfNotFound: true);
-        m_Player_ToggleWeapons = m_Player.FindAction("ToggleWeapons", throwIfNotFound: true);
-        m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -670,11 +584,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_VerticalStrafe;
     private readonly InputAction m_Player_Look;
+    private readonly InputAction m_Player_LookZ;
     private readonly InputAction m_Player_Pause;
     private readonly InputAction m_Player_Use1;
-    private readonly InputAction m_Player_Use2;
-    private readonly InputAction m_Player_ToggleWeapons;
-    private readonly InputAction m_Player_Dash;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -699,6 +611,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Look => m_Wrapper.m_Player_Look;
         /// <summary>
+        /// Provides access to the underlying input action "Player/LookZ".
+        /// </summary>
+        public InputAction @LookZ => m_Wrapper.m_Player_LookZ;
+        /// <summary>
         /// Provides access to the underlying input action "Player/Pause".
         /// </summary>
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
@@ -706,18 +622,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Use1".
         /// </summary>
         public InputAction @Use1 => m_Wrapper.m_Player_Use1;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/Use2".
-        /// </summary>
-        public InputAction @Use2 => m_Wrapper.m_Player_Use2;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/ToggleWeapons".
-        /// </summary>
-        public InputAction @ToggleWeapons => m_Wrapper.m_Player_ToggleWeapons;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/Dash".
-        /// </summary>
-        public InputAction @Dash => m_Wrapper.m_Player_Dash;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -753,21 +657,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @LookZ.started += instance.OnLookZ;
+            @LookZ.performed += instance.OnLookZ;
+            @LookZ.canceled += instance.OnLookZ;
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
             @Use1.started += instance.OnUse1;
             @Use1.performed += instance.OnUse1;
             @Use1.canceled += instance.OnUse1;
-            @Use2.started += instance.OnUse2;
-            @Use2.performed += instance.OnUse2;
-            @Use2.canceled += instance.OnUse2;
-            @ToggleWeapons.started += instance.OnToggleWeapons;
-            @ToggleWeapons.performed += instance.OnToggleWeapons;
-            @ToggleWeapons.canceled += instance.OnToggleWeapons;
-            @Dash.started += instance.OnDash;
-            @Dash.performed += instance.OnDash;
-            @Dash.canceled += instance.OnDash;
         }
 
         /// <summary>
@@ -788,21 +686,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @LookZ.started -= instance.OnLookZ;
+            @LookZ.performed -= instance.OnLookZ;
+            @LookZ.canceled -= instance.OnLookZ;
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
             @Use1.started -= instance.OnUse1;
             @Use1.performed -= instance.OnUse1;
             @Use1.canceled -= instance.OnUse1;
-            @Use2.started -= instance.OnUse2;
-            @Use2.performed -= instance.OnUse2;
-            @Use2.canceled -= instance.OnUse2;
-            @ToggleWeapons.started -= instance.OnToggleWeapons;
-            @ToggleWeapons.performed -= instance.OnToggleWeapons;
-            @ToggleWeapons.canceled -= instance.OnToggleWeapons;
-            @Dash.started -= instance.OnDash;
-            @Dash.performed -= instance.OnDash;
-            @Dash.canceled -= instance.OnDash;
         }
 
         /// <summary>
@@ -891,6 +783,13 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLook(InputAction.CallbackContext context);
         /// <summary>
+        /// Method invoked when associated input action "LookZ" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLookZ(InputAction.CallbackContext context);
+        /// <summary>
         /// Method invoked when associated input action "Pause" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -904,26 +803,5 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnUse1(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Use2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUse2(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "ToggleWeapons" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnToggleWeapons(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "Dash" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnDash(InputAction.CallbackContext context);
     }
 }
