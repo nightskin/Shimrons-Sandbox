@@ -9,84 +9,95 @@ public class World : MonoBehaviour
     [SerializeField][Min(1)] int worldSizeInChunks = 1;
 
 
-    [Range(2, 64)] public float maxHeight = 64;
-    [Range(2, 63)] public float minHeight = 16;
-
-    [SerializeField][Min(1)] float baseRoughness = 1.0f;
-    [SerializeField][Min(1)] float roughness = 2.0f;
-    [SerializeField][Range(0, 1)] float persistance = 0.5f;
-    [SerializeField][Range(1, 10)] int layers = 1;
-
-
-    [HideInInspector] public int voxelRes = 64;
-    [HideInInspector] public float voxelSpacing = 10;
+    public int voxelResolution = 64;
+    public float voxelSize = 10;
 
 
     [Range(0f, 1f)] public float isoLevel = 0.5f;
     [Range(0f, 1f)] public float noiseScale = 10;
-    [Range(0f, 1f)] public float tunnelScale = 0.0001f;
 
     Noise noise;
 
-    void Awake()
+    void Start()
     {
-        float chunkSize = voxelRes * voxelSpacing;
+        float chunkSize = voxelResolution * voxelSize;
         noise = new Noise(seed.GetHashCode());
-        Random.InitState(seed.GetHashCode());
 
         if(terrainChunkPrefab)
         {
             for (int x = -worldSizeInChunks; x < worldSizeInChunks; x++)
             {
-                for (int z = -worldSizeInChunks; z < worldSizeInChunks; z++)
+                for(int y = -worldSizeInChunks; y < worldSizeInChunks; y++)
                 {
-                    var chunk = Instantiate(terrainChunkPrefab, new Vector3(x, 0, z) * (chunkSize - voxelSpacing), Quaternion.identity, transform);
-                    chunk.name = x.ToString() + "," + z.ToString();
-                    chunk.GetComponent<TerrainChunk>().offset = new Vector3(x, 0, z) * (voxelRes - 1);
-
-                    if (x == 0 && z == 0)
+                    for (int z = -worldSizeInChunks; z < worldSizeInChunks; z++)
                     {
-                        //player.position = new Vector3(x, 0, z);
-                    }
+                        var chunk = Instantiate(terrainChunkPrefab, new Vector3(x, y, z) * (chunkSize - voxelSize), Quaternion.identity, transform);
+                        chunk.name = x.ToString() + "," + y.ToString() + "," + z.ToString();
+                        chunk.GetComponent<TerrainChunk>().offset = new Vector3(x, y, z) * (voxelResolution - 1);
 
+                    }
                 }
+
             }
         }
 
 
 
     }
-    
 
-
-    float Perlin2D(float x, float z)
+    void FixedUpdate()
     {
-        float noiseValue = 0;
-        float frequency = baseRoughness;
-        float amplitude = 1;
+        
+    }
 
-        for(int i = 0; i < layers; i++)
+    public float Perlin3D(Vector3 position)
+    {
+       return noise.Evaluate(position * noiseScale);
+    }
+
+    public int ToVoxelIndex(Vector3 position)
+    {
+        return ((int)(position.x / voxelSize)) + ((int)(position.y / voxelSize) * voxelResolution) + ((int)(position.z / voxelSize) * voxelResolution * voxelResolution);
+    }
+
+    public Vector3 ToPosition(int i)
+    {
+        int x = i % voxelResolution;
+        int y = i / voxelResolution % voxelResolution;
+        int z = i / voxelResolution / voxelResolution % voxelResolution;
+        return new Vector3(x, y, z) * voxelSize;
+    }
+
+    public Vector2[] GetUVs(Vector3 a, Vector3 b, Vector3 c)
+    {
+        Vector3 s1 = b - a;
+        Vector3 s2 = c - a;
+        Vector3 norm = Vector3.Cross(s1, s2).normalized; // the normal
+
+        norm.x = Mathf.Abs(norm.x);
+        norm.y = Mathf.Abs(norm.y);
+        norm.z = Mathf.Abs(norm.z);
+
+        Vector2[] uvs = new Vector2[3];
+        if (norm.x >= norm.z && norm.x >= norm.y) // x plane
         {
-            float v = Mathf.Pow(noise.Evaluate(new Vector3(x, 0, z) * frequency), 4);
-            noiseValue += v * amplitude;
-            frequency *= roughness;
-            amplitude *= persistance;
+            uvs[0] = new Vector2(a.z, a.y) / voxelSize;
+            uvs[1] = new Vector2(b.z, b.y) / voxelSize;
+            uvs[2] = new Vector2(c.z, c.y) / voxelSize;
+        }
+        else if (norm.z >= norm.x && norm.z >= norm.y) // z plane
+        {
+            uvs[0] = new Vector2(a.x, a.y) / voxelSize;
+            uvs[1] = new Vector2(b.x, b.y) / voxelSize;
+            uvs[2] = new Vector2(c.x, c.y) / voxelSize;
+        }
+        else if (norm.y >= norm.x && norm.y >= norm.z) // y plane
+        {
+            uvs[0] = new Vector2(a.x, a.z) / voxelSize;
+            uvs[1] = new Vector2(b.x, b.z) / voxelSize;
+            uvs[2] = new Vector2(c.x, c.z) / voxelSize;
         }
 
-
-        return Util.ConvertRange(0, layers, 0, 1, noiseValue);
+        return uvs;
     }
-
-    public float MakeTunnels(Vector3 point)
-    {
-        return Util.ConvertRange(-1, 1, 0, 1, noise.Evaluate(point * tunnelScale));
-    }
-
-    public float EvaluateHeight(Vector3 pos)
-    {
-        float gap = maxHeight - minHeight;
-        float height = (Perlin2D(pos.x * noiseScale, pos.z * noiseScale) * gap) + minHeight;
-        return Mathf.Clamp01(height - pos.y);
-    }
-
 }

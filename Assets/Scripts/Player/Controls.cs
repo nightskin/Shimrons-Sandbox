@@ -96,12 +96,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""type"": ""PassThrough"",
                     ""id"": ""47d3872d-4dd5-41dc-8c2d-09e63905875d"",
                     ""expectedControlType"": ""Vector2"",
-                    ""processors"": ""NormalizeVector2"",
+                    ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""VerticalStrafe"",
+                    ""name"": ""MoveY"",
                     ""type"": ""Value"",
                     ""id"": ""b35c68ae-f0ca-4c1c-bf93-0e82467c3f17"",
                     ""expectedControlType"": ""Axis"",
@@ -137,7 +137,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Use1"",
+                    ""name"": ""Atk"",
                     ""type"": ""Button"",
                     ""id"": ""96cd0cc9-4fe8-4689-9a94-df33aeb923a8"",
                     ""expectedControlType"": """",
@@ -152,7 +152,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""id"": ""7dabca12-a0b9-4e42-929f-9050b76636fc"",
                     ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": "";Gamepad"",
                     ""action"": ""Move"",
                     ""isComposite"": false,
@@ -284,7 +284,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""id"": ""8daf851b-76c2-4904-a06c-b68ee3e42e80"",
                     ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""StickDeadzone"",
                     ""groups"": "";Gamepad"",
                     ""action"": ""Look"",
                     ""isComposite"": false,
@@ -319,7 +319,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""Use1"",
+                    ""action"": ""Atk"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -330,7 +330,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
-                    ""action"": ""Use1"",
+                    ""action"": ""Atk"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -341,7 +341,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""VerticalStrafe"",
+                    ""action"": ""MoveY"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -352,7 +352,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KeyboardMouse"",
-                    ""action"": ""VerticalStrafe"",
+                    ""action"": ""MoveY"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -363,7 +363,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";KeyboardMouse"",
-                    ""action"": ""VerticalStrafe"",
+                    ""action"": ""MoveY"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -374,7 +374,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""VerticalStrafe"",
+                    ""action"": ""MoveY"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -385,7 +385,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""VerticalStrafe"",
+                    ""action"": ""MoveY"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -396,7 +396,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""VerticalStrafe"",
+                    ""action"": ""MoveY"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -496,11 +496,11 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
-        m_Player_VerticalStrafe = m_Player.FindAction("VerticalStrafe", throwIfNotFound: true);
+        m_Player_MoveY = m_Player.FindAction("MoveY", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_LookZ = m_Player.FindAction("LookZ", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
-        m_Player_Use1 = m_Player.FindAction("Use1", throwIfNotFound: true);
+        m_Player_Atk = m_Player.FindAction("Atk", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -582,11 +582,11 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Player;
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
-    private readonly InputAction m_Player_VerticalStrafe;
+    private readonly InputAction m_Player_MoveY;
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_LookZ;
     private readonly InputAction m_Player_Pause;
-    private readonly InputAction m_Player_Use1;
+    private readonly InputAction m_Player_Atk;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -603,9 +603,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Move => m_Wrapper.m_Player_Move;
         /// <summary>
-        /// Provides access to the underlying input action "Player/VerticalStrafe".
+        /// Provides access to the underlying input action "Player/MoveY".
         /// </summary>
-        public InputAction @VerticalStrafe => m_Wrapper.m_Player_VerticalStrafe;
+        public InputAction @MoveY => m_Wrapper.m_Player_MoveY;
         /// <summary>
         /// Provides access to the underlying input action "Player/Look".
         /// </summary>
@@ -619,9 +619,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Use1".
+        /// Provides access to the underlying input action "Player/Atk".
         /// </summary>
-        public InputAction @Use1 => m_Wrapper.m_Player_Use1;
+        public InputAction @Atk => m_Wrapper.m_Player_Atk;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -651,9 +651,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
-            @VerticalStrafe.started += instance.OnVerticalStrafe;
-            @VerticalStrafe.performed += instance.OnVerticalStrafe;
-            @VerticalStrafe.canceled += instance.OnVerticalStrafe;
+            @MoveY.started += instance.OnMoveY;
+            @MoveY.performed += instance.OnMoveY;
+            @MoveY.canceled += instance.OnMoveY;
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
@@ -663,9 +663,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
-            @Use1.started += instance.OnUse1;
-            @Use1.performed += instance.OnUse1;
-            @Use1.canceled += instance.OnUse1;
+            @Atk.started += instance.OnAtk;
+            @Atk.performed += instance.OnAtk;
+            @Atk.canceled += instance.OnAtk;
         }
 
         /// <summary>
@@ -680,9 +680,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
-            @VerticalStrafe.started -= instance.OnVerticalStrafe;
-            @VerticalStrafe.performed -= instance.OnVerticalStrafe;
-            @VerticalStrafe.canceled -= instance.OnVerticalStrafe;
+            @MoveY.started -= instance.OnMoveY;
+            @MoveY.performed -= instance.OnMoveY;
+            @MoveY.canceled -= instance.OnMoveY;
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
@@ -692,9 +692,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
-            @Use1.started -= instance.OnUse1;
-            @Use1.performed -= instance.OnUse1;
-            @Use1.canceled -= instance.OnUse1;
+            @Atk.started -= instance.OnAtk;
+            @Atk.performed -= instance.OnAtk;
+            @Atk.canceled -= instance.OnAtk;
         }
 
         /// <summary>
@@ -769,12 +769,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMove(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "VerticalStrafe" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "MoveY" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnVerticalStrafe(InputAction.CallbackContext context);
+        void OnMoveY(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Look" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -797,11 +797,11 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPause(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Use1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Atk" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnUse1(InputAction.CallbackContext context);
+        void OnAtk(InputAction.CallbackContext context);
     }
 }

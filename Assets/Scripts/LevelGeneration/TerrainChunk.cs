@@ -7,110 +7,168 @@ using UnityEngine;
 public class TerrainChunk : MonoBehaviour
 {
     public Vector3 offset;
-
     World world;
-    Voxel[,,] voxels = null;
+    Voxel[] voxels = null;
+    [SerializeField] float isoLevel = 0;
+    [HideInInspector] public float radius;
+
+    
     Mesh mesh;
     List<Vector3> verts = new List<Vector3>();
     List<Vector2> uvs = new List<Vector2>();
     List<int> tris = new List<int>();
     int buffer = 0;
-
+    
     void Start()
     {
-        world = transform.parent.GetComponent<World>();
-        if (voxels == null)
-        {
-            GenerateVoxelData();
-        }
-        GenerateMeshData();
-    }
+        world = transform.root.GetComponent<World>();
+        CreateVoxelData();
+        CreateMeshData();
 
-    void GenerateVoxelData()
-    {
-        voxels = new Voxel[world.voxelRes, world.voxelRes, world.voxelRes];
-        
-        for(int x = 0; x < world.voxelRes; x++)
-        {
-            for (int y = 0; y < world.voxelRes; y++)
-            {
-                for (int z = 0; z < world.voxelRes; z++)
-                {
-                    voxels[x, y, z] = new Voxel();
-                    voxels[x, y, z].position = new Vector3(x, y, z) * world.voxelSpacing;
-                    voxels[x, y, z].value = world.EvaluateHeight(new Vector3(x, y, z) + offset);
-
-                    if (y < world.minHeight)
-                    {
-                        voxels[x, y, z].value -= world.MakeTunnels(new Vector3(x, y, z) + offset);
-                    }
-
-                }
-            }
-        }
-    }
-    
-    void GenerateMeshData()
-    {
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         mesh.MarkDynamic();
-
         GetComponent<MeshFilter>().mesh = mesh;
+        UpdateMesh();
 
-        for (int x = world.voxelRes - 1; x > 0; x--)
+    }
+    
+    public void Teraform(RaycastHit hit)
+    {
+        Vector3 pos = transform.InverseTransformPoint(hit.point);
+        pos.x = Mathf.Round(pos.x / world.voxelSize) * world.voxelSize;
+        pos.y = Mathf.Round(pos.y / world.voxelSize) * world.voxelSize;
+        pos.z = Mathf.Round(pos.z / world.voxelSize) * world.voxelSize;
+        int i = world.ToVoxelIndex(pos);
+        
+        //If voxel is already deactivated check the next one
+        if(voxels[i].value > isoLevel)
         {
-            for (int y = world.voxelRes - 1; y > 0; y--)
+            pos = transform.InverseTransformPoint(hit.point - (hit.normal * world.voxelSize / 2));
+            pos.x = Mathf.Round(pos.x / world.voxelSize) * world.voxelSize;
+            pos.y = Mathf.Round(pos.y / world.voxelSize) * world.voxelSize;
+            pos.z = Mathf.Round(pos.z / world.voxelSize) * world.voxelSize; 
+            i = world.ToVoxelIndex(pos);
+            voxels[i].value -= Time.deltaTime;
+        }
+        else
+        {
+            voxels[i].value -= Time.deltaTime;
+        }
+
+        
+        
+        if (BlocksGone())
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+
+            verts.Clear();
+            tris.Clear();
+            uvs.Clear();
+            buffer = 0;
+            CreateMeshData();
+            UpdateMesh();
+        }
+    }
+
+    void CreateVoxelData()
+    {
+        radius = Random.Range(world.voxelSize * (world.voxelResolution - 1) / 4, world.voxelSize * (world.voxelResolution - 1) / 2);
+
+        voxels = new Voxel[(int)Mathf.Pow(world.voxelResolution, 3)];
+        for (int i = 0; i < voxels.Length; i++)
+        {
+            voxels[i] = new Voxel();
+            voxels[i].position = world.ToPosition(i);
+            voxels[i].value = world.Perlin3D(voxels[i].position + transform.position);
+        }
+    }
+    
+    void CreateMeshData()
+    {
+        for (int i = voxels.Length; i > 0; i--)
+        {
+            Vector3 position = world.ToPosition(i);
+            Voxel[] points = new Voxel[]
             {
-                for (int z = world.voxelRes - 1; z > 0; z--)
+                    voxels[world.ToVoxelIndex(position + new Vector3(0,0,-1))],
+                    voxels[world.ToVoxelIndex(position +  new Vector3(-1, 0, -1))],
+                    voxels[world.ToVoxelIndex(position +  new Vector3(-1, 0, 0))],
+                    voxels[world.ToVoxelIndex(position)],
+                    voxels[world.ToVoxelIndex(position + new Vector3(0, -1, -1))],
+                    voxels[world.ToVoxelIndex(position + new Vector3(-1,-1,-1))],
+                    voxels[world.ToVoxelIndex(position + new Vector3(-1,-1, 0))],
+                    voxels[world.ToVoxelIndex(position + new Vector3(0, -1, 0))]
+            };
+            
+            int cubeIndex = Voxel.GetState(points, isoLevel);
+            int[] triangulation = MarchingCubesTables.triTable[cubeIndex];
+
+            Vector3[] triVerts = new Vector3[3];
+            int triIndex = 0;
+
+            foreach (int edgeIndex in triangulation)
+            {
+                if (edgeIndex > -1)
                 {
-                    Voxel[] corners = new Voxel[]
+                    int a = MarchingCubesTables.edgeConnections[edgeIndex][0];
+                    int b = MarchingCubesTables.edgeConnections[edgeIndex][1];
+                    Vector3 vertexPos = Voxel.LerpPoint(points[a], points[b], world.isoLevel);
+                    verts.Add(vertexPos);
+                    tris.Add(buffer);
+                    
+                    if(triIndex == 0)
                     {
-                        voxels[x,y,z-1],
-                        voxels[x-1,y,z-1],
-                        voxels[x-1,y,z],
-                        voxels[x,y,z],
-                        voxels[x,y-1,z-1],
-                        voxels[x-1,y-1,z-1],
-                        voxels[x-1,y-1,z],
-                        voxels[x,y-1,z],
-                    };
-                    int cubeIndex = Util.GetState(corners, world.isoLevel);
-                    int[] triangulation = MarchingCubesTables.triTable[cubeIndex];
-                    foreach (int edgeIndex in triangulation)
-                    {
-                        if (edgeIndex > -1)
-                        {
-                            int a = MarchingCubesTables.edgeConnections[edgeIndex][0];
-                            int b = MarchingCubesTables.edgeConnections[edgeIndex][1];
-                            Vector3 vertexPos = Util.LerpPoint(corners[a], corners[b], world.isoLevel);
-                            verts.Add(vertexPos);
-                            tris.Add(buffer);
-                            buffer++;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        triVerts[0] = vertexPos;
+                        triIndex++;
                     }
+                    else if(triIndex == 1)
+                    {
+                        triVerts[1] = vertexPos;
+                        triIndex++;
+                    }
+                    else if(triIndex == 2)
+                    {
+                        triVerts[2] = vertexPos;
+                        uvs.AddRange(world.GetUVs(triVerts[0], triVerts[1], triVerts[2]));
+                        triIndex = 0;
+                    }
+
+                    buffer++;
+                }
+                else
+                {
+                    break;
                 }
             }
         }
 
+    }
+    
+    bool BlocksGone()
+    {
+        for (int i = 0; i < world.voxelResolution * world.voxelResolution * world.voxelResolution; i++)
+        {
+            if (voxels[i].value > isoLevel) return false;
+        }
+
+        return true;
+    }
+
+    void UpdateMesh()
+    {
         mesh.Clear();
         mesh.vertices = verts.ToArray();
         mesh.triangles = tris.ToArray();
-        for (int v = 0; v < verts.Count - 2; v += 3)
-        {
-            Vector2[] uvForTri = Util.GetUVs(verts[v], verts[v + 1], verts[v + 2]);
-            uvs.AddRange(uvForTri);
-        }
         mesh.uv = uvs.ToArray();
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
         GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
-    
+
 
 }

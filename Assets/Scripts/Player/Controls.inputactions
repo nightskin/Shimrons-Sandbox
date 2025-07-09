@@ -10,12 +10,12 @@
                     "type": "PassThrough",
                     "id": "47d3872d-4dd5-41dc-8c2d-09e63905875d",
                     "expectedControlType": "Vector2",
-                    "processors": "NormalizeVector2",
+                    "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "VerticalStrafe",
+                    "name": "MoveY",
                     "type": "Value",
                     "id": "b35c68ae-f0ca-4c1c-bf93-0e82467c3f17",
                     "expectedControlType": "Axis",
@@ -51,7 +51,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Use1",
+                    "name": "Atk",
                     "type": "Button",
                     "id": "96cd0cc9-4fe8-4689-9a94-df33aeb923a8",
                     "expectedControlType": "",
@@ -66,7 +66,7 @@
                     "id": "7dabca12-a0b9-4e42-929f-9050b76636fc",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "StickDeadzone",
                     "groups": ";Gamepad",
                     "action": "Move",
                     "isComposite": false,
@@ -198,7 +198,7 @@
                     "id": "8daf851b-76c2-4904-a06c-b68ee3e42e80",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "StickDeadzone",
                     "groups": ";Gamepad",
                     "action": "Look",
                     "isComposite": false,
@@ -233,7 +233,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Use1",
+                    "action": "Atk",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -244,7 +244,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse",
-                    "action": "Use1",
+                    "action": "Atk",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -255,7 +255,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "VerticalStrafe",
+                    "action": "MoveY",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -266,7 +266,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardMouse",
-                    "action": "VerticalStrafe",
+                    "action": "MoveY",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -277,7 +277,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardMouse",
-                    "action": "VerticalStrafe",
+                    "action": "MoveY",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -288,7 +288,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "VerticalStrafe",
+                    "action": "MoveY",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -299,7 +299,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "VerticalStrafe",
+                    "action": "MoveY",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -310,7 +310,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "VerticalStrafe",
+                    "action": "MoveY",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },

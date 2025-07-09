@@ -35,32 +35,7 @@ public class Util
 
         return new Color(r, g, b, a);
     }
-
-    public static int GetState(Voxel[] points, float isoLevel)
-    {
-        int state = 0;
-        if (points[0].value >= isoLevel) state |= 1;
-        if (points[1].value >= isoLevel) state |= 2;
-        if (points[2].value >= isoLevel) state |= 4;
-        if (points[3].value >= isoLevel) state |= 8;
-        if (points[4].value >= isoLevel) state |= 16;
-        if (points[5].value >= isoLevel) state |= 32;
-        if (points[6].value >= isoLevel) state |= 64;
-        if (points[7].value >= isoLevel) state |= 128;
-        return state;
-    }
-
-    public static Vector3 GetMidPoint(Voxel point1, Voxel point2)
-    {
-        return (point1.position + point2.position) / 2;
-    }
-
-    public static Vector3 LerpPoint(Voxel point1, Voxel point2, float isoLevel)
-    {
-        float t = (isoLevel - point1.value) / (point2.value - point1.value);
-        return Vector3.Lerp(point1.position, point2.position, t);
-    }
-
+    
     public static Vector2[] GetUVs(Vector3 a, Vector3 b, Vector3 c)
     {
         Vector3 s1 = b - a;

@@ -7,13 +7,12 @@ public class FirstPersonController : MonoBehaviour
 
     //Components
     [SerializeField] CharacterController controller;
+    [SerializeField] Camera camera;
 
     // For basic motion
     [SerializeField] float speed = 25.0f;
-
     //For Look/Aim
     [SerializeField] float lookSpeed = 100;
-    [SerializeField][Range(0, 1)] float lookThreshold = 0.1f;
 
     void Awake()
     {
@@ -24,6 +23,7 @@ public class FirstPersonController : MonoBehaviour
     void Start()
     {
         if(!controller) controller = GetComponent<CharacterController>();
+        if(!camera) camera = Camera.main;
     }
     
     void Update()
@@ -32,15 +32,15 @@ public class FirstPersonController : MonoBehaviour
         Move();
     }
 
-    
+
     void Move()
     {
         //Basic Motion
         float x = controls.Player.Move.ReadValue<Vector2>().x;
-        float y = controls.Player.VerticalStrafe.ReadValue<float>();
+        float y = controls.Player.MoveY.ReadValue<float>();
         float z = controls.Player.Move.ReadValue<Vector2>().y;
 
-        Vector3 moveDirection = (transform.right * x + transform.forward * z + transform.up * y).normalized;
+        Vector3 moveDirection = (camera.transform.right * x + camera.transform.forward * z + camera.transform.up * y).normalized;
         controller.Move(moveDirection * speed * Time.deltaTime);
     }
 
@@ -50,11 +50,9 @@ public class FirstPersonController : MonoBehaviour
         float y = controls.Player.Look.ReadValue<Vector2>().y;
         float z = controls.Player.LookZ.ReadValue<float>();
 
-
-        if(x > lookThreshold || x < -lookThreshold) transform.rotation *= Quaternion.AngleAxis(lookSpeed * x * Time.deltaTime, Vector3.up);
-        if(y > lookThreshold || y < -lookThreshold) transform.rotation *= Quaternion.AngleAxis(lookSpeed * y * Time.deltaTime, Vector3.left);
-        if(z > lookThreshold || z < -lookThreshold) transform.rotation *= Quaternion.AngleAxis(lookSpeed * z * Time.deltaTime, Vector3.forward);
-
+        transform.rotation *= Quaternion.AngleAxis(x * lookSpeed * Time.deltaTime, Vector3.up);
+        transform.rotation *= Quaternion.AngleAxis(y * lookSpeed * Time.deltaTime, Vector3.left);
+        transform.rotation *= Quaternion.AngleAxis(z * lookSpeed * Time.deltaTime, Vector3.forward);
     }
 
 }
