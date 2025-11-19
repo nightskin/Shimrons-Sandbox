@@ -6,22 +6,18 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class TerrainChunk : MonoBehaviour
 {
-    public Vector3 offset;
+    bool[,,] voxelData = null;
     World world;
-    Voxel[] voxels = null;
-    [SerializeField] float isoLevel = 0;
-    [HideInInspector] public float radius;
 
-    
     Mesh mesh;
     List<Vector3> verts = new List<Vector3>();
     List<Vector2> uvs = new List<Vector2>();
     List<int> tris = new List<int>();
     int buffer = 0;
-    
+
     void Start()
     {
-        world = transform.root.GetComponent<World>();
+        world = GameObject.Find("World").GetComponent<World>();
         CreateVoxelData();
         CreateMeshData();
 
@@ -32,131 +28,106 @@ public class TerrainChunk : MonoBehaviour
         UpdateMesh();
 
     }
-    
-    public void Teraform(RaycastHit hit)
-    {
-        Vector3 pos = transform.InverseTransformPoint(hit.point);
-        pos.x = Mathf.Round(pos.x / world.voxelSize) * world.voxelSize;
-        pos.y = Mathf.Round(pos.y / world.voxelSize) * world.voxelSize;
-        pos.z = Mathf.Round(pos.z / world.voxelSize) * world.voxelSize;
-        int i = world.ToVoxelIndex(pos);
-        
-        //If voxel is already deactivated check the next one
-        if(voxels[i].value > isoLevel)
-        {
-            pos = transform.InverseTransformPoint(hit.point - (hit.normal * world.voxelSize / 2));
-            pos.x = Mathf.Round(pos.x / world.voxelSize) * world.voxelSize;
-            pos.y = Mathf.Round(pos.y / world.voxelSize) * world.voxelSize;
-            pos.z = Mathf.Round(pos.z / world.voxelSize) * world.voxelSize; 
-            i = world.ToVoxelIndex(pos);
-            voxels[i].value -= Time.deltaTime;
-        }
-        else
-        {
-            voxels[i].value -= Time.deltaTime;
-        }
-
-        
-        
-        if (BlocksGone())
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-
-            verts.Clear();
-            tris.Clear();
-            uvs.Clear();
-            buffer = 0;
-            CreateMeshData();
-            UpdateMesh();
-        }
-    }
 
     void CreateVoxelData()
     {
-        radius = Random.Range(world.voxelSize * (world.voxelResolution - 1) / 4, world.voxelSize * (world.voxelResolution - 1) / 2);
-
-        voxels = new Voxel[(int)Mathf.Pow(world.voxelResolution, 3)];
-        for (int i = 0; i < voxels.Length; i++)
+        voxelData = new bool[world.chunkResolution, world.chunkResolution, world.chunkResolution];
+        for (int x = 0; x < world.chunkResolution; x++)
         {
-            voxels[i] = new Voxel();
-            voxels[i].position = world.ToPosition(i);
-            voxels[i].value = world.Perlin3D(voxels[i].position + transform.position);
-        }
-    }
-    
-    void CreateMeshData()
-    {
-        for (int i = voxels.Length; i > 0; i--)
-        {
-            Vector3 position = world.ToPosition(i);
-            Voxel[] points = new Voxel[]
+            for (int y = 0; y < world.chunkResolution; y++)
             {
-                    voxels[world.ToVoxelIndex(position + new Vector3(0,0,-1))],
-                    voxels[world.ToVoxelIndex(position +  new Vector3(-1, 0, -1))],
-                    voxels[world.ToVoxelIndex(position +  new Vector3(-1, 0, 0))],
-                    voxels[world.ToVoxelIndex(position)],
-                    voxels[world.ToVoxelIndex(position + new Vector3(0, -1, -1))],
-                    voxels[world.ToVoxelIndex(position + new Vector3(-1,-1,-1))],
-                    voxels[world.ToVoxelIndex(position + new Vector3(-1,-1, 0))],
-                    voxels[world.ToVoxelIndex(position + new Vector3(0, -1, 0))]
-            };
-            
-            int cubeIndex = Voxel.GetState(points, isoLevel);
-            int[] triangulation = MarchingCubesTables.triTable[cubeIndex];
-
-            Vector3[] triVerts = new Vector3[3];
-            int triIndex = 0;
-
-            foreach (int edgeIndex in triangulation)
-            {
-                if (edgeIndex > -1)
+                for (int z = 0; z < world.chunkResolution; z++)
                 {
-                    int a = MarchingCubesTables.edgeConnections[edgeIndex][0];
-                    int b = MarchingCubesTables.edgeConnections[edgeIndex][1];
-                    Vector3 vertexPos = Voxel.LerpPoint(points[a], points[b], world.isoLevel);
-                    verts.Add(vertexPos);
-                    tris.Add(buffer);
-                    
-                    if(triIndex == 0)
-                    {
-                        triVerts[0] = vertexPos;
-                        triIndex++;
-                    }
-                    else if(triIndex == 1)
-                    {
-                        triVerts[1] = vertexPos;
-                        triIndex++;
-                    }
-                    else if(triIndex == 2)
-                    {
-                        triVerts[2] = vertexPos;
-                        uvs.AddRange(world.GetUVs(triVerts[0], triVerts[1], triVerts[2]));
-                        triIndex = 0;
-                    }
-
-                    buffer++;
-                }
-                else
-                {
-                    break;
+                    voxelData[x, y, z] = world.Perlin3D(new Vector3(x, y, z) * world.voxelSize + transform.position);
                 }
             }
         }
-
     }
-    
-    bool BlocksGone()
+
+    void CreateMeshData()
     {
-        for (int i = 0; i < world.voxelResolution * world.voxelResolution * world.voxelResolution; i++)
+        for (int x = 0; x < world.chunkResolution; x++)
         {
-            if (voxels[i].value > isoLevel) return false;
-        }
+            for (int y = 0; y < world.chunkResolution; y++)
+            {
+                for (int z = 0; z < world.chunkResolution; z++)
+                {
+                    if (voxelData[x, y, z])
+                    {
+                        if (x == world.chunkResolution - 1)
+                        {
+                            DrawQuadRight(new Vector3(x, y, z) * world.voxelSize);
+                        }
+                        if (x == 0)
+                        {
+                            DrawQuadLeft(new Vector3(x, y, z) * world.voxelSize);
+                        }
+                        if (y == world.chunkResolution - 1)
+                        {
+                            DrawQuadTop(new Vector3(x, y, z) * world.voxelSize);
+                        }
+                        if (y == 0)
+                        {
+                            DrawQuadBottom(new Vector3(x, y, z) * world.voxelSize);
+                        }
+                        if (z == world.chunkResolution - 1)
+                        {
+                            DrawQuadFront(new Vector3(x, y, z) * world.voxelSize);
+                        }
+                        if (z == 0)
+                        {
+                            DrawQuadBack(new Vector3(x, y, z) * world.voxelSize);
+                        }
 
-        return true;
+                        if (x < world.chunkResolution - 1)
+                        {
+                            if (!voxelData[x + 1, y, z])
+                            {
+                                DrawQuadRight(new Vector3(x, y, z) * world.voxelSize);
+                            }
+                        }
+                        if (x > 0)
+                        {
+                            if (!voxelData[x - 1, y, z])
+                            {
+                                DrawQuadLeft(new Vector3(x, y, z) * world.voxelSize);
+                            }
+                        }
+                        if (y < world.chunkResolution - 1)
+                        {
+                            if (!voxelData[x, y + 1, z])
+                            {
+                                DrawQuadTop(new Vector3(x, y, z) * world.voxelSize);
+                            }
+                        }
+                        if (y > 0)
+                        {
+                            if (!voxelData[x, y - 1, z])
+                            {
+                                DrawQuadBottom(new Vector3(x, y, z) * world.voxelSize);
+                            }
+                        }
+                        if (z < world.chunkResolution - 1)
+                        {
+                            if (!voxelData[x, y, z + 1])
+                            {
+                                DrawQuadFront(new Vector3(x, y, z) * world.voxelSize);
+                            }
+                        }
+                        if (z > 0)
+                        {
+                            if (!voxelData[x, y, z - 1])
+                            {
+                                DrawQuadBack(new Vector3(x, y, z) * world.voxelSize);
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
     }
+
 
     void UpdateMesh()
     {
@@ -169,6 +140,139 @@ public class TerrainChunk : MonoBehaviour
         GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
+    void DrawQuadBottom(Vector3 position)
+    {
+        verts.Add(new Vector3(0, 0, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 0, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 0, 0) * world.voxelSize + position);
+        verts.Add(new Vector3(0, 0, 0) * world.voxelSize + position);
+
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 1);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 3);
+
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+
+        buffer += 4;
+    }
+
+    void DrawQuadTop(Vector3 position)
+    {
+        verts.Add(new Vector3(0, 1, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 1, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 1, 0) * world.voxelSize + position);
+        verts.Add(new Vector3(0, 1, 0) * world.voxelSize + position);
+
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 1);
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 3);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 2);
+
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+
+        buffer += 4;
+    }
+
+    void DrawQuadFront(Vector3 position)
+    {
+        verts.Add(new Vector3(0, 1, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 1, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 0, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(0, 0, 1) * world.voxelSize + position);
+
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 1);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 3);
+
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+
+        buffer += 4;
+    }
+
+    void DrawQuadBack(Vector3 position)
+    {
+        verts.Add(new Vector3(0, 1, 0) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 1, 0) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 0, 0) * world.voxelSize + position);
+        verts.Add(new Vector3(0, 0, 0) * world.voxelSize + position);
+
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 1);
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 3);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 2);
+
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+
+        buffer += 4;
+    }
+
+    void DrawQuadLeft(Vector3 position)
+    {
+        verts.Add(new Vector3(0, 1, 0) * world.voxelSize + position);
+        verts.Add(new Vector3(0, 1, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(0, 0, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(0, 0, 0) * world.voxelSize + position);
+
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 1);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 3);
+
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+
+        buffer += 4;
+    }
+
+    void DrawQuadRight(Vector3 position)
+    {
+        verts.Add(new Vector3(1, 1, 0) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 1, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 0, 1) * world.voxelSize + position);
+        verts.Add(new Vector3(1, 0, 0) * world.voxelSize + position);
+
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 1);
+        tris.Add(buffer + 2);
+        tris.Add(buffer + 3);
+        tris.Add(buffer + 0);
+        tris.Add(buffer + 2);
+
+        uvs.Add(new Vector2(1, 1));
+        uvs.Add(new Vector2(1, 0));
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+
+        buffer += 4;
+    }
+
+    
 
 
 }

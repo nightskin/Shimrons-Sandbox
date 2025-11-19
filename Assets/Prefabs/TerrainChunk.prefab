@@ -122,8 +122,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5c8515f9d78d304883d42e558361d61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 0, z: 0}
-  isoLevel: 0
-  radius: 0
-  voxelResolution: 10
-  voxelSize: 100
+  computeShader: {fileID: 7200000, guid: 007607b95f1d15145b21eae2d438d0d2, type: 3}
